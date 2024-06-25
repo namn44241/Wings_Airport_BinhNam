@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>wings_airport_management</title>
+<!-- <link rel="stylesheet" href="styles.css"> -->
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<style>
+    /* Preloader styles */
+    #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(58,123,213,1) 0%, rgba(0,210,255,1) 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    #preloader.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .spinner {
+        width: 150px;
+        height: 150px;
+        border: 4px solid #fff;
+        border-top: 4px solid #ff6f61;
+        border-radius: 50%;
+        animation: spin 1s linear infinite, scale 3s ease-in-out infinite;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .avatar {
+        width: 80%;
+        height: 80%;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        animation: pulse 2s ease-in-out infinite;
+    }
+    /* Trong file CSS */
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @keyframes scale {
+        0%, 100% { transform: rotate(0deg) scale(1); }
+        50% { transform: rotate(180deg) scale(1.1); }
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    /* Hide the main content initially */
+    body > *:not(#preloader) {
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    body.loaded > *:not(#preloader) {
+        opacity: 1;
+    }
+    /* Định dạng cho toàn bộ trang */
+    body {
+        font-family: 'Roboto', Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f8ff;
+    }
+        /* styles.css */
+    body, html {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px;
+        background-color: #0c7de6;
+        background: linear-gradient(90deg, rgba(58,123,213,1) 0%, rgba(0,210,255,1) 100%);
+    }
+    
+    nav ul {
+        list-style: none;
+        display: flex;
+        gap: 30px;
+    }
+
+    nav ul li {
+        display: inline;
+    
+    }
+
+    nav ul li a {
+        text-decoration: none;
+        color: #fafbfd;
+        font-weight: bold;
+        
+    }
+
+    button {
+        padding: 10px 20px;
+        margin: 10px;
+        border: none;
+        background-color: #0044cc;
+        color: white;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0033aa;
+    }
+
+    .logo {
+        border-radius: 15px; /* Bo góc 15px */
+        overflow: hidden; /* Đảm bảo hình ảnh bên trong cũng được bo góc */
+        width: 15%; /* Đặt chiều rộng của logo */
+        height: auto; /* Chiều cao tự động theo nội dung */
+    }
+    /* CSS 4 hình ảnh --> */
+    .slide1-container {
+        position: relative;
+        height: 65vh;
+        width: 100vw;
+        overflow: hidden;
+    }
+
+    .slide1-wrapper {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+    }
+
+    .slide1 {
+        flex: 0 0 100%;
+        position: relative;
+    }
+
+    .slide1 img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .navbar {
+            display: flex;
+            justify-content: space-around;
+            background-color: #0c7de6;
+            background: linear-gradient(90deg, rgba(58,123,213,1) 0%, rgba(0,210,255,1) 100%);
+            padding: 8px;
+            font-weight: bold;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+    .navbar div {
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        color: white;
+    }
+
+    .navbar div.active,
+    .navbar div:hover {
+        background-color: #0078d7; /* Darker blue when active or hovered */
+    }
+    .container {
+        padding: 20px; /* Adjusted padding to align with table */
+        background-color: #fff;
+        max-width: 1000px;
+        margin: 20px auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        display: none; /* Initially hidden */
+    }
+
+    .container.active {
+        display: block; /* Show when active class is added */
+    }
+
+    .container h2 {
+        margin-top: 0;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .form-group button:hover {
+        background-color: #ffc107;
+    }
+
+    .info-text {
+        margin-top: 20px;
+        font-weight: bold;
+    }
+
+    .tab {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .tab button {
+        background-color: #f1f1f1;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        flex: 1;
+    }
+
+    .tab button.active {
+        background-color: #ffc107;
+        color: white;
+    }
+
+    .form-container form {
+        display: none;
+        flex-direction: column;
+    }
+
+    .form-container form.active {
+        display: flex;
+    }
+
+    table {
+        width: 100%; /* Ensure the table takes full width */
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    table, th, td {
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 12px; /* Adjusted padding for better alignment */
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+    .overlay1 {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 100;
+    }
+    .container {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        z-index: 101;
+    }
+    /* Tin tức */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f8f8;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Styles for notification section */
+    .notification-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: transparent; /* Remove yellow background */
+        /* border: 1px solid #4a9eec; */
+        border-radius: 4px;
+        padding: 10px;
+        margin: 20px;
+        width: 66.67%; /* Chiếm 2/3 chiều rộng màn hình */
+        margin: 0 auto; /* Căn giữa khối */
+    }
+
+    .notification-content {
+        flex: 1;
+        margin-left: 10px;
+        color: blue;
+    }
+
+    .notification-type {
+        font-weight: bold;
+        color: black;
+    }
+
+    .notification-nav {
+        display: flex;
+        align-items: center;
+    }
+
+    .notification-nav button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 0 5px;
+    }
+
+    .notification-nav button:focus {
+        outline: none;
+    }
+
+    .notification-more {
+        margin-left: 10px;
+    }
+
+    .notification-more a {
+        text-decoration: none; /* Remove underline from link */
+        color: blue;
+    }
+
+    .notification-more a:hover {
+        text-decoration: underline; /* Add underline on hover if needed */
+    }
+    .horizontal {
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-around; /* Sắp xếp các phần tử con theo hàng ngang */
+        background-color:rgba(241, 199, 14, 0.182);
+        width: 80%; 
+        margin: 0 auto; /* Căn giữa khối */
+
+    }
+    .item {
+        display: flex;
+        flex-direction: column; /* Sắp xếp ảnh và chữ theo cột */
+        align-items: center; /* Canh giữa các phần tử theo chiều ngang */
+        
+    }
+    .item img {
+        margin-bottom: 10px; /* Khoảng cách giữa ảnh và chữ */
+    }
+    .item a {
+    color: #333; /* Màu chữ ban đầu */
+    text-decoration: none; /* Bỏ gạch chân dưới chữ */
+    transition: color 0.3s ease; /* Hiệu ứng chuyển đổi màu mượt mà */
+    }
+
+    .item a:hover {
+    color: #0077ff; /* Màu chữ khi di chuột vào */
+    }
+    .item:nth-child(2) p{
+        margin-top: 18px;
+
+    }
+    .item:nth-child(3) p {
+        margin-top: 12px; /* hoặc 15px, tùy thuộc vào kết quả thực tế */
+    }
+    .container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Thiết lập kiểu cho nút bấm */
+    .dropdown a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: transparent;
+        color: black;
+        border: 1px solid black;
+        text-decoration: none;
+        font-size: 16px;
+        cursor: pointer;
+        
+    }
+
+    .nutbam {
+        align-items: center;
+        width: 80%;
+    }
+
+    /* Thiết lập kiểu cho nội dung dropdown */
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: rgba(241, 199, 14, 0.726);
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+
+    /* Thiết lập kiểu cho các liên kết trong dropdown */
+    .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+
+    /* Thay đổi màu nền khi di chuột qua liên kết trong dropdown */
+    .dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* Hiển thị nội dung dropdown khi nút bấm được nhấn */
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+    .image-container {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .image-container.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .delete-button {
+                color: #ccc;
+                cursor: pointer;
+                text-decoration: none;
+            }
+    .delete-button:hover {
+        color: #000;
+    }
+    .hiden {
+        display: none;
+    }
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    } 
+    /* .padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    } */
+
+
+    .dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+    .image-grid {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .image-container {
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+    }
+
+    .image-container .text {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 10px;
+        max-height: 100%; 
+        overflow: hidden; 
+    }
+
+    .row {
+        display: flex;
+        justify-content: center;
+    }
+    .dropdown > a::after {
+        content: '🔽';
+        font-size: 0.8em;
+        margin-left: 5px;
+
+    }
+
+    .row img {
+        max-width: 300px;
+        height: auto;
+        margin: 10px;
+        cursor: pointer;
+        display: block;
+        width: 200px; 
+        height: 300px; 
+        object-fit: cover; 
+        border-radius: 10px;
+    }
+
+    #image-overlay {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.9);
+    }
+
+    #close-button {
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+        position: absolute;
+        top: 10px;
+        right: 25px;
+        cursor: pointer;
+        }
+    #view-more-btn {
+        display: block;
+        margin: 0 auto;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        background-color: #ffffff;
+        color: #4a90e2;
+        border: 2px solid #4a90e2;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    #view-more-btn:hover {
+        background-color: #4a90e2;
+        color: #ffffff;
+    }
+    .section-title {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        font-size: 24px;
+        color: #333;
+        margin: 20px 0;
+    }
+    .section-title::before,
+    .section-title::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #aaa;
+        margin: 0 10px;
+    }
+
+    .section-title span {
+        display: inline-block;
+        padding: 0 10px;
+    }
+
+    .slider-container {
+        overflow: hidden;
+        width: 80%; /* Set width to 2/3 of the screen */
+        margin: 0 auto; /* Center the slider */
+    }
+
+    .slider {
+        display: flex;
+        transition: transform 1s ease;
+        width: max-content; /* Ensure the slider container is only as wide as its content */
+    }
+
+    .slide {
+        position: relative;
+        flex: 0 0 auto; /* Prevent shrinking */
+        margin: 10px;
+        box-sizing: border-box;
+    }
+
+    .slide img {
+        display: block;
+        width: 300px; /* Set a fixed width for the images */
+        height: 200px; /* Set a fixed height for the images */
+        object-fit: cover; /* Ensure images cover the container without stretching */
+    }
+
+    .text {
+        text-align: center;
+        background-color: #f0f0f0; /* Change this to your preferred background color */
+        padding: 10px;
+        font-family: Arial, sans-serif; /* Change this to your preferred font */
+        font-size: 16px;
+    }
+
+    .dots1 {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #bbb;
+        margin: 0 5px;
+        cursor: pointer;
+    }
+    .container1 {
+        max-width: 500px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .form-group1 {
+        margin-bottom: 15px;
+    }
+
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    input[type="email"],
+    input[type="text"],
+    select {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .checkbox-group input[type="checkbox"] {
+        margin-right: 10px; 
+    }
+    button {
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    .checkbox-group a {
+        text-decoration: none;
+        color: #007BFF;
+    }
+    .checkbox-group a:hover {
+        text-decoration: underline;
+    }
+    .khampha {
+        font-family: 'Serif';
+        text-align:center;
+        width: 80%;
+    }
+    .image-container .text {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px;
+        text-align: center;
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+            /* ... các thuộc tính khác ... */
+        font-size: 14px; /* Điều chỉnh kích thước font nếu cần */
+        padding: 5px; /* Giảm padding nếu cần thêm không gian cho text */
+    }
+    footer {
+        background-color: #0c7de6;
+        background: linear-gradient(90deg, rgba(58,123,213,1) 0%, rgba(0,210,255,1) 100%);
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+        border-radius: 15px;
+    }
+
+    .footer-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0 10%;
+    }
+
+    .footer-column {
+        flex: 1;
+        padding: 0 10px;
+    }
+
+    .footer-column h3 {
+        margin-bottom: 10px;
+        font-family: 'Arial';
+        
+    }
+
+    .footer-column a {
+        color: white;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 5px;
+        font-size: 12px;
+    }
+
+    .footer-column a:hover {
+        color: rgb(255, 187, 0);
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .footer-container {
+            flex-direction: column;
+        }
+        .footer-column {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+    }
+</style>
+<body>
+    <div id="preloader">
+        <div class="spinner">
+          <img src="images/wings.png" alt="Avatar" class="avatar">
+        </div>
+        
+      </div>
+    <header>
+        <div>
+            <img class="logo" src="images/wings.png" alt="wings">
+            <!-- <p style="color: #f0f0f0;">wings_airport_management</p> -->
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#" id="helpLink">TRỢ GIÚP</a></li>
+                <li><a href="#">ĐĂNG NHẬP</a></li>
+                <li><a href="#">ĐĂNG KÝ</a></li>
+                <li><a href="#">VIETNAM - TIẾNG VIỆT</a></li>
+            </ul>
+        </nav>
+    </header>
+    <script>
+        document.getElementById("helpLink").onclick = function(event) {
+            event.preventDefault(); // Ngăn chặn hành động mặc định của liên kết
+            alert("Chào mừng bạn đến với Sân bay Trực tuyến! <br> ### Giới thiệu Sân bay Trực tuyến là nền tảng giúp bạn quản lý và đặt vé máy bay một cách dễ dàng và thuận tiện. Hãy khám phá các tính năng và dịch vụ mà chúng tôi cung cấp để có một trải nghiệm đi bay tuyệt vời! ### Các tính năng chính- Đặt chỗ và quản lý chuyến bay của bạn. - Xem thông tin chi tiết về lịch trình chuyến bay và sân bay. - Hỗ trợ trực tuyến để giải đáp mọi thắc mắc của bạn.- Thông tin chi tiết về các dịch vụ và tiện ích tại sân bay. ### Các câu hỏi thường gặp (FAQ) **Làm thế nào để đặt vé máy bay?**Để đặt vé máy bay trên Sân bay Trực tuyến, bạn có thể truy cập vào phần đặt chỗ và làm theo các bước hướng dẫn trên màn hình.**Tôi có thể thay đổi lịch trình chuyến bay như thế nào?**Bạn có thể thay đổi lịch trình chuyến bay bằng cách truy cập vào phần quản lý chuyến bay và chọn chức năng sửa đổi lịch trình.### Liên hệ và Hỗ trợNếu bạn cần thêm thông tin hoặc hỗ trợ, vui lòng liên hệ với chúng tôi qua email support@sanbaytructuyen.com hoặc gọi số hotline: 0123 456 789")
+        }
+    </script>
+
+    <!-- <h2 class="w3-center">Trình Chiếu Hình Ảnh</h2> -->
+    <div class="slide1-container">
+        <div class="slide1-wrapper">
+            <div class="slide1">
+                <img src="images/header1.jpg" alt="Hình Ảnh 1">
+            </div>
+            <div class="slide1">
+                <img src="images/header3.jpg" alt="Hình Ảnh 3">
+            </div>
+            <div class="slide1">
+                <img src="images/header4.jpg" alt="Hình Ảnh 4">
+            </div>
+            <div class="slide1">
+                <img src="images/header5.jpg" alt="Hình Ảnh 4">
+            </div>
+        </div>
+        <div class="dots"></div>
+    </div>
+    
+    <!--  4 hình ảnh -->
+    <script>
+        let slideIndex = 0;
+        let slides = document.querySelectorAll(".slide1");
+        let slideWrapper = document.querySelector(".slide1-wrapper");
+        let dotsContainer = document.querySelector(".dots");
+
+        function showSlides() {
+            slideIndex++;
+            if (slideIndex > slides.length) {
+                slideIndex = 1;
+            }
+            slideWrapper.style.transform = `translateX(-${(slideIndex - 1) * 100}%)`;
+
+            // Xóa lớp "active" khỏi tất cả các điểm
+            let dots = dotsContainer.querySelectorAll(".dot");
+            dots.forEach(dot => dot.classList.remove("active"));
+
+            // Thêm lớp "active" vào điểm tương ứng
+            let currentDot = dotsContainer.querySelector(`.dot:nth-child(${slideIndex})`);
+            if (currentDot) {
+                currentDot.classList.add("active");
+            }
+        }
+
+        function createDots() {
+            for (let i = 0; i < slides.length; i++) {
+                let dot = document.createElement("span");
+                dot.classList.add("dot");
+                dotsContainer.appendChild(dot);
+            }
+            dotsContainer.querySelector(".dot:first-child").classList.add("active");
+        }
+
+        createDots();
+        showSlides();
+        setInterval(showSlides, 5000);
+    </script>
+  <!-- New Small Box Section -->
+ 
+  <div class="navbar">
+    <div onclick="showContainer('booking')">ĐĂNG KÝ KHÁCH HÀNG</div>
+    <div onclick="showContainer('manage')">ĐẶT CHỖ</div>
+    <div onclick="showContainer('checkin')">TRA CỨU CHUYẾN BAY, LỊCH BAY</div>
+</div>
+<div class="overlay1" id="overlay1"></div>
+<!-- Đăng ký khách hàng -->
+<div class="container" id="booking-container" style="display: none;">
+    <div class="form-group">
+        <label for="customer-id">Mã khách hàng</label>
+        <input type="text" id="customer-id" placeholder="">
+    </div>
+    <div class="form-group">
+        <label for="customer-name">Tên khách hàng</label>
+        <input type="text" id="customer-name" placeholder="">
+    </div>
+    <div class="form-group">
+        <label for="customer-address">Địa chỉ</label>
+        <input type="text" id="customer-address" placeholder="">
+    </div>
+    <div class="form-group">
+        <label for="customer-phone">Số điện thoại</label>
+        <input type="tel" id="customer-phone" pattern="[0-9]{10}" placeholder="">
+    </div>
+    <div class="form-group">
+        <button style="width: 150px;">Đăng ký</button>
+    </div>
+</div>
+<!-- ĐẶT CHỖ -->
+<div class="container" id="manage-container" style="display: none;">
+    <div class="form-group">
+        <label for="manage-customer-id">Mã khách hàng</label>
+        <input type="text" id="manage-customer-id" placeholder="">
+    </div>
+    <div class="form-group">
+        <label for="manage-flight-id">Mã chuyến bay</label>
+        <input type="text" id="manage-flight-id" placeholder="">
+    </div>
+    <div class="form-group">
+        <label for="manage-departure-date">Ngày đi</label>
+        <input type="date" id="manage-departure-date" placeholder="">
+    </div>
+    <div class="form-group">
+        <button style="width: 150px;">Đặt chỗ</button>
+    </div>
+</div>
+<!-- TRA CỨU CHUYẾN BAY, LỊCH BAY -->
+<div class="container" id="checkin-container" style="display: none;">
+    <form action="/search" method="GET">
+        <p>Tìm kiếm mã chuyến bay:</p>
+        <input type="text" name="query" placeholder="Nhập từ khóa tìm kiếm..." required>
+        <button type="submit" style="background:#ffc107; border-style: none; color:#0a0a0a;  border-radius: 5px;  padding: 5px">Tìm kiếm</button>
+    </form>
+    <form action="/search" method="GET">
+        <p>Tìm kiếm sân bay:</p>
+        <input type="text" name="query" placeholder="Nhập từ khóa tìm kiếm..." required>
+        <button type="submit" style="background:#ffc107; border-style: none; color:#0e0d0d;  border-radius: 5px;  padding: 5px">Tìm kiếm</button>
+    </form>
+    <table style="max-width:1000px">
+        <tr>
+            <th>Mã chuyến bay</th>
+            <th>Số hiệu máy bay</th>
+            <th>Mã loại máy bay</th>
+            <th>Hãng sản xuất</th>
+            <th>Sân bay đi</th>
+            <th>Giờ đi</th>
+            <th>Giờ đến</th>
+        </tr>
+        <!-- <tbody>
+            {% for row in flight_info %} -->
+            <tr>
+                <td>{{ row.MaChuyenBay }}</td>
+                <td>{{ row.SoHieuMayBay }}</td>
+                <td>{{ row.MaLoaiMayBay }}</td>
+                <td>{{ row.HangSanXuat }}</td>
+                <td>{{ row.SanBayDi }}</td>
+                <td>{{ row.GioDi }}</td>
+                <td>{{ row.GioDen }}</td>
+            </tr>
+            <!-- {% endfor %}
+        </tbody> -->
+    </table>
+</div>
+
+<script>
+    function showContainer(containerId) {
+        var containers = document.querySelectorAll('.container');
+        var clickedContainer = document.getElementById(containerId + '-container');
+        var overlay = document.getElementById('overlay1');
+
+        // Hide all containers
+        containers.forEach(function(container) {
+            container.style.display = 'none';
+        });
+
+        // Show overlay and clicked container
+        overlay.style.display = 'block';
+        clickedContainer.style.display = 'block';
+    }
+
+    // Close popup when clicking outside
+    document.getElementById('overlay1').addEventListener('click', function() {
+        var containers = document.querySelectorAll('.container');
+        containers.forEach(function(container) {
+            container.style.display = 'none';
+        });
+        this.style.display = 'none';
+    });
+</script>
+    <hr style="height: 1px; background-color: black; border: none;">
+
+    <h2 class="khampha">Khám Phá Các Chuyến Bay Phổ Biến Nhất Của Chúng Tôi</h2>
+    <div style="margin-left: 10.5%;">
+        <div class="dropdown">
+            <a href="#" onclick="toggleDropdown(event, 'dropdownContent1')">Nhấn vào đây để hiển thị các lựa chọn</a>
+            <div class="dropdown-content" id="dropdownContent1">
+                <!-- Các lựa chọn sẽ được thêm vào đây bằng JavaScript -->
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" onclick="toggleDropdown(event, 'dropdownContent2')">Ngân sách</a>
+            <div class="dropdown-content" id="dropdownContent2">
+                <a href="#">Lựa chọn 4</a>
+                <a href="#">Lựa chọn 5</a>
+                <a href="#">Lựa chọn 6</a>
+            </div>
+        </div>
+    </div>
+    <div class="image-grid">
+        <div class="row" id="row1"></div>
+        <div class="row" id="row2" style="display: none;"></div>
+        <div class="row" id="row3" style="display: none;"></div>
+    </div>
+    <button style="margin-top: 1%;" id="view-more-btn" onclick="toggleAdditionalImages()">Xem thêm</button>
+
+    <script>
+    const flightRoutes = [
+        { from: "Hà Nội", to: "Đà Nẵng", image: "images/danang1.jpg", link: "https://pixabay.com/vi/images/search/%C4%91%C3%A0%20n%E1%BA%B5ng/" },
+        { from: "Hà Nội", to: "Hạ Long", image: "images/halong1.jpg", link: "https://pixabay.com/vi/images/search/v%E1%BB%8Bnh%20h%E1%BA%A1%20long/" },
+        { from: "TP Hồ Chí Minh", to: "Đà Nẵng", image: "images/danang3.jpg", link: "https://pixabay.com/vi/images/search/%C4%91%C3%A0%20n%E1%BA%B5ng/" },
+        { from: "Hà Nội", to: "TP Hồ Chí Minh", image: "images/du-lich-sai-gon-1.webp", link: "https://www.pexels.com/vi-vn/tim-kiem/th%C3%A0nh%20ph%E1%BB%91%20h%E1%BB%93%20ch%C3%AD%20minh/" },
+        { from: "Hà Nội", to: "Sa Pa", image: "images/sapa.jpg", link: "https://pixabay.com/vi/images/search/sapa/" },
+        { from: "TP Hồ Chí Minh", to: "Ninh Bình", image: "images/ninhbinh.jpg", link: "https://pixabay.com/vi/images/search/ninh%20binh/" },
+        { from: "Hà Nội", to: "Hội An", image: "images/hoian.jpeg", link: "https://anhdephd.vn/hinh-anh-hoi-an/" },
+        { from: "TP Hồ Chí Minh", to: "Hà Nội", image: "images/dong-phong-nha.jpg", link: "https://www.pexels.com/vi-vn/tim-kiem/h%C3%A0%20n%E1%BB%99i/" },
+        { from: "Hà Nội", to: "Nha Trang", image: "images/nhatrang.jpg", link: "https://toigingiuvedep.vn/hinh-anh-nha-trang/" },
+        { from: "Huế", to: "Hà Nội", image: "images/hanoi1.jpg", link: "https://www.pexels.com/vi-vn/tim-kiem/h%C3%A0%20n%E1%BB%99i/" },
+        { from: "Hà Nội", to: "Quảng Bình", image: "images/dong-phong-nha.jpg", link: "https://top10quangbinh.vn/hinh-anh-quang-binh/" },
+        { from: "Đà Lạt", to: "TP Hồ Chí Minh", image: "images/hcm.jpg", link: "https://www.pexels.com/vi-vn/tim-kiem/th%C3%A0nh%20ph%E1%BB%91%20h%E1%BB%93%20ch%C3%AD%20minh/" }
+    ];
+
+    let showAllImages = false;
+
+    function populateDropdown() {
+        const dropdown = document.getElementById('dropdownContent1');
+        const uniqueRoutes = [...new Set(flightRoutes.map(route => `${route.from} đến ${route.to}`))];
+        
+        uniqueRoutes.forEach(route => {
+            const a = document.createElement('a');
+            a.href = '#';
+            a.textContent = route;
+            a.onclick = () => filterImages(route);
+            dropdown.appendChild(a);
+        });
+    }
+
+    function filterImages(selectedRoute) {
+        const rows = [document.getElementById('row1'), document.getElementById('row2'), document.getElementById('row3')];
+        rows.forEach(row => row.innerHTML = '');
+        
+        const filteredRoutes = flightRoutes.filter(route => `${route.from} đến ${route.to}` === selectedRoute);
+        displayImages(filteredRoutes);
+    }
+
+    function displayImages(routes) {
+        const rows = [document.getElementById('row1'), document.getElementById('row2'), document.getElementById('row3')];
+        rows.forEach(row => {
+            row.innerHTML = '';
+            row.style.display = 'none';
+        });
+        
+        const displayCount = showAllImages ? routes.length : Math.min(4, routes.length);
+
+        for (let i = 0; i < displayCount; i++) {
+            const route = routes[i];
+            const rowIndex = Math.floor(i / 4);
+            const row = rows[rowIndex];
+            row.style.display = 'flex';
+            
+            const div = document.createElement('div');
+            div.className = 'image-container';
+            div.innerHTML = `
+                <a href="${route.link}" target="_blank">
+                    <img src="${route.image}" alt="${route.from} to ${route.to}">
+                </a>
+                <div class="text">Từ ${route.from} đến ${route.to}</div>
+            `;
+            row.appendChild(div);
+            
+            // Thêm hiệu ứng fade in
+            setTimeout(() => {
+                div.classList.add('show');
+            }, 50 * i); // Tạo hiệu ứng lần lượt
+        }
+    }
+
+    function toggleAdditionalImages() {
+        showAllImages = !showAllImages;
+        displayImages(flightRoutes);
+        document.getElementById('view-more-btn').textContent = showAllImages ? "Thu gọn" : "Xem thêm";
+    }
+
+    function toggleDropdown(event, id) {
+        event.preventDefault();
+        document.getElementById(id).classList.toggle("show");
+    }
+
+    // Khởi tạo dropdown và hiển thị 4 ảnh đầu tiên khi trang web được tải
+    document.addEventListener('DOMContentLoaded', () => {
+        populateDropdown();
+        displayImages(flightRoutes);
+    });
+
+    // Đóng dropdown khi click ra ngoài
+    window.onclick = function(event) {
+        if (!event.target.matches('.dropdown a')) {
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+        }
+    }
+    </script>
+    
+    
+    <div id="image-overlay">
+        <span id="close-button" onclick="closeOverlay()">&times;</span>
+        <div class="image-grid">
+            <div class="row">
+                <img id="image1" src="images/image9.png" alt="Image 1">
+                <img id="image2" src="images/image10.png" alt="Image 2">
+                <img id="image3" src="images/image11.png" alt="Image 3">
+                <img id="image4" src="images/image12.png" alt="Image 4">
+            </div>
+            <div class="row">
+                <img id="image5" src="images/image13.png" alt="Image 5">
+                <img id="image6" src="images/image14.png" alt="Image 6">
+                <img id="image7" src="images/image15.png" alt="Image 7">
+                <img id="image8" src="images/image16.png" alt="Image 8">
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function toggleDropdown(event, dropdownId) {
+            event.preventDefault();
+            var dropdownContent = document.getElementById(dropdownId);
+            if (dropdownContent.style.display === 'block') {
+                dropdownContent.style.display = 'none';
+            } else {
+                dropdownContent.style.display = 'block';
+            }
+        }
+    
+        function showDropdown(event, dropdownId) {
+            event.preventDefault();
+            toggleDropdown(event, dropdownId);
+        }
+    
+        function showAdditionalImages() {
+            var additionalRows = document.querySelectorAll('.row:not(:first-child)');
+            var viewMoreBtn = document.getElementById('view-more-btn');
+
+            if (additionalRows[0].style.display === 'none') {
+                additionalRows.forEach(function(row) {
+                    row.style.display = 'flex';
+                });
+                viewMoreBtn.innerText = 'Ẩn bớt';
+            } else {
+                additionalRows.forEach(function(row) {
+                    row.style.display = 'none';
+                });
+                viewMoreBtn.innerText = 'Xem thêm';
+            }
+        }
+        function closeOverlay() {
+            var overlay = document.getElementById('image-overlay');
+            overlay.style.display = 'none';
+        }
+    
+        // Đóng menu dropdown nếu người dùng nhấp vào bất kỳ đâu bên ngoài menu
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown a')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.style.display === 'block') {
+                        openDropdown.style.display = 'none';
+                    }
+                }
+            }
+        }
+    
+        window.onload = function() {
+            var links = document.getElementsByTagName('a');
+            for (var i = 0; i < links.length; i++) {
+                links[i].style.textDecoration = 'none';
+            }
+        }
+    </script>
+
+    <br><div class="dropdown-note" style="text-align: center; font-size: 11px;">*Giá vé hiển thị được thu thập trong vòng 48 giờ và có thể không còn hiệu lực tại thời điểm đặt chỗ. Chúng tôi có thể thu thêm phí và lệ phí cho một số sản phẩm và dịch vụ.</div>
+    <div class="section-title">
+        <span>Thông tin nổi bật</span>
+    </div>
+
+    <!-- slide chuyển cảnh -->
+    <div class="slider-container">
+        <div class="slider">
+            <div class="slide">
+                <img src="images/image9.png" alt="Image 1">
+                <div class="text">Ẩm thực trên mây hạng Thương gia</div>
+            </div>
+            <div class="slide">
+                <img src="images/image10.png" alt="Image 2">
+                <div class="text">Ẩm thực hạng Phổ thông đặc biệt</div>
+            </div>
+            <div class="slide">
+                <img src="images/image11.png" alt="Image 3">
+                <div class="text">Ẩm thực hạng Phổ thông</div>
+            </div>
+            <div class="slide">
+                <img src="images/image12.png" alt="Image 4">
+                <div class="text">Hạng Thương Gia</div>
+            </div>
+            <div class="slide">
+                <img src="images/image13.png" alt="Image 5">
+                <div class="text">Hạng Phổ Thông Đặc Biệt</div>
+            </div>
+            <div class="slide">
+                <img src="images/image14.png" alt="Image 6">
+                <div class="text">Dịch vụ trên không</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dots1"></div>
+
+    <script>
+        const slides1 = document.querySelectorAll('.slide');
+        const slider = document.querySelector('.slider');
+        const dotsContainer1 = document.querySelector('.dots1');
+        let currentSlide = 0;
+        const slidesPerPage = 3;
+    
+        // Create dots dynamically
+        const numDots = Math.ceil(slides1.length / slidesPerPage);
+        for (let i = 0; i < numDots; i++) {
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            if (i === 0) {
+                dot.classList.add('active');
+            }
+            dotsContainer1.appendChild(dot);
+        }
+    
+        const dots1 = document.querySelectorAll('.dot');
+    
+        function showSlide(n) {
+            currentSlide = n;
+            const slideWidth = slides1[0].offsetWidth + 20; // Including margin
+            const maxTranslate = -(Math.floor((slides1.length - 1) / slidesPerPage) * slidesPerPage * slideWidth);
+            let translateX = -n * slidesPerPage * slideWidth;
+            
+            // Ensure we don't translate beyond the last set of slides
+            translateX = Math.max(maxTranslate, Math.min(0, translateX));
+            
+            slider.style.transform = `translateX(${translateX}px)`;
+            
+            dots1.forEach((dot, index) => {
+                dot.classList.toggle('active', index === n);
+            });
+        }
+    
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % numDots;
+            showSlide(currentSlide);
+        }
+    
+        showSlide(currentSlide);
+    
+        let slideInterval = setInterval(nextSlide, 5000);
+    
+        dots1.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                clearInterval(slideInterval);
+                showSlide(index);
+                slideInterval = setInterval(nextSlide, 5000); // Restart interval
+            });
+        });
+    </script>
+
+    <!-- xoay xoay -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+        document.getElementById('preloader').classList.add('hidden');
+        document.body.classList.add('loaded');
+        }, 3000); 
+    });
+    
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+        if (!document.body.classList.contains('loaded')) {
+            document.getElementById('preloader').classList.add('hidden');
+            document.body.classList.add('loaded');
+        }
+        }, 500);
+    });
+    </script>
+      
+      <div class="section-title">
+        <span>Đăng ký E-Newsletter</span>
+    </div>
+    <p style="text-align:center;">Đăng ký E-Newsletter để cập nhật các thông tin, ưu đãi mới nhất. (Không bao gồm các thông tin, ưu đãi từ chương trình Bông Sen Vàng)</p>
+    <div class="container1">
+        <form id="newsletter-form">
+            <div class="form-group1">
+                <label for="email">Địa chỉ Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div id="additional-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="language">Ngôn ngữ</label>
+                    <select id="language" name="language">
+                        <option value="vi">Tiếng Việt</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="salutation">Danh xưng</label>
+                    <select id="salutation" name="salutation">
+                        <option value="mr">Ông</option>
+                        <option value="ms">Bà</option>
+                        <option value="miss">Cô</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Họ</label>
+                    <input type="text" id="last_name" name="last_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="first_name">Tên</label>
+                    <input type="text" id="first_name" name="first_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="country">Quốc Gia/Vùng</label>
+                    <select id="country" name="country">
+                        <option value="vietnam">Vietnam</option>
+                        <option value="usa">United States</option>
+                        <option value="canada">Canada</option>
+                        <option value="uk">United Kingdom</option>
+                        <option value="australia">Australia</option>
+                        <option value="france">France</option>
+                        <option value="germany">Germany</option>
+                        <option value="japan">Japan</option>
+                        <option value="south_korea">South Korea</option>
+                        <option value="china">China</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" id="privacy_policy" name="privacy_policy" required>
+                    <label for="privacy_policy">Tôi đã đọc, đồng ý với các điều khoản của <a href="#">Chính sách bảo mật</a> và xác nhận rằng tôi đã đủ 16 tuổi.</label>
+                </div>
+                <button type="submit">ĐĂNG KÝ</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var emailInput = document.getElementById('email');
+        var additionalFields = document.getElementById('additional-fields');
+
+        emailInput.addEventListener('focus', function() {
+            additionalFields.style.display = 'block';
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!emailInput.contains(event.target) && !additionalFields.contains(event.target)) {
+                additionalFields.style.display = 'none';
+            }
+        });
+    });
+    </script><br>
+    <footer>
+        <div class="footer-container">
+            <div class="footer-column">
+                <h3 style="color: rgb(255, 187, 0)">Wings Airlines</h3>
+                <a href="#" onclick="showAlert('Thông tin về Wings Airlines')">Giới Thiệu Công Ty</a>
+                <a href="#" onclick="showAlert('Thông tin về đội bay của Wings Airlines')">Đội Bay</a>
+                <a href="#" onclick="showAlert('Danh sách đối tác của Wings Airlines')">Đối tác</a>
+                <a href="#" onclick="showAlert('Thông tin truyền thông về Wings Airlines')">Thông Tin Truyền Hình</a>
+                <a href="#" onclick="showAlert('Các hoạt động trách nhiệm xã hội của Wings Airlines')">Trách Nhiệm Xã Hội</a>
+                <a href="#" onclick="showAlert('Thông tin quan hệ cổ đông của Wings Airlines')">Quan Hệ Cổ Đông</a>
+                <a href="#" onclick="showAlert('Thông tin đấu thầu của Wings Airlines')">Thông Tin Đấu Thầu</a>
+                <a href="#" onclick="showAlert('Cơ hội việc làm tại Wings Airlines')">Việc Làm Với Wings Airlines</a>
+            </div>
+            <div class="footer-column">
+                <h3 style="color: rgb(255, 187, 0)">Pháp Lý</h3>
+                <a href="#" onclick="showAlert('Các điều kiện và điều khoản sử dụng dịch vụ')">Các Điều Kiện & Điều Khoản</a>
+                <a href="#" onclick="showAlert('Điều lệ vận chuyển của Wings Airlines')">Điều Lệ Vận Chuyển</a>
+                <a href="#" onclick="showAlert('Điều kiện sử dụng cookies trên website')">Điều Kiện Sử Dụng Cookies</a>
+                <a href="#" onclick="showAlert('Chính sách bảo mật thông tin khách hàng')">Bảo Mật Thông Tin</a>
+                <a href="#" onclick="showAlert('Quy chế hoạt động sàn thương mại điện tử')">Quy Chế Hoạt Động Sàn TMĐT</a>
+            </div>
+            <div class="footer-column">
+                <h3 style="color: rgb(255, 187, 0)">Hỗ Trợ</h3>
+                <a href="#" onclick="showAlert('Gửi góp ý về dịch vụ của Wings Airlines')">Góp Ý Dịch Vụ</a>
+                <a href="#" onclick="showAlert('Trung tâm trợ giúp khách hàng')">Trung Tâm Trợ Giúp</a>
+                <a href="#" onclick="showAlert('Thông tin liên hệ các chi nhánh của Wings Airlines')">Liên Hệ Với Chi Nhánh Của VNA</a>
+                <a href="#" onclick="showAlert('Chính sách bảo vệ hành khách của Wings Airlines')">Chính Sách Bảo Vệ Hành Khách</a>
+                <a href="#" onclick="showAlert('Trợ lý ảo của Wings Airports')">Trợ Lý Ảo Của Wings Airports</a>
+                <a href="#" onclick="showAlert('Tải ứng dụng di động của Wings Airlines')">Ứng Dụng Di Động</a>
+            </div>
+            <div class="footer-column">
+                <h3 style="color: rgb(255, 187, 0)">Vận Tải Hàng</h3>
+                <a href="#" onclick="showAlert('Thông tin về dịch vụ vận chuyển hàng hóa')">Trang Web Hàng Hoá</a>
+            </div>
+            <div class="footer-column">
+                <h3 style="color: rgb(255, 187, 0)">Thông Tin</h3>
+                <a href="#" onclick="showAlert('Thông tin hợp tác với chương trình')">Hợp Tác Với Chương Trình</a>
+                <a href="#" onclick="showAlert('Thông tin về Capybara')">Capybara</a>
+                <a href="#" onclick="showAlert('Cẩm nang du lịch từ Wings Airlines')">Cẩm Nang Du Lịch</a>
+                <a href="#" onclick="showAlert('Thông tin quảng cáo với Wings Airports')">Quảng Cáo Với Wings Airports</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+    function showAlert(message) {
+        alert(message);
+    }
+    </script>
+  
+</body>
+</html>

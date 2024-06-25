@@ -1,0 +1,14 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Open thu.html",
+            "file": "c:\\Users\\ADMIN\\Downloads\\wings_airport_management-20240615T173905Z-001\\wings_airport_management\\thu.html"
+        }
+    ]
+}
