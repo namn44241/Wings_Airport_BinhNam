@@ -3,6 +3,7 @@ import pyodbc
 import os
 from datetime import datetime
 from flask_cors import CORS
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 CORS(app) 
@@ -276,6 +277,116 @@ def admin():
                            next_flight_id=next_flight_id,
                            stats= stats)
 
+# Cấu hình Flask-Mail
+app.config['MAIL_SERVER'] = 'smtp.example.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'your-email@example.com'
+app.config['MAIL_PASSWORD'] = 'your-password'
+
+mail = Mail(app)
+
+@app.route('/send-email', methods=['POST'])
+def send_email():
+    data = request.json
+    email = data.get('email')
+    language = data.get('language')
+    full_name = data.get('fullName')
+
+    if language == 'vi':
+        subject = 'Xác nhận đăng ký Wings Airport'
+        body = f'Xin chào {full_name}, đây là Wings Airport, chúc bạn ngày mới tốt lành'
+    else:
+        subject = 'Wings Airport Subscription Confirmation'
+        body = f'Hello {full_name}, this is Wings Airport, have a great day'
+
+    try:
+        msg = Message(subject,
+                      sender='noreply@wingsairport.com',
+                      recipients=[email])
+        msg.body = body
+        mail.send(msg)
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        print(f"Error sending email: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/flights', methods=['GET'])
+def get_flights():
+    try:
+        query = """
+        SELECT cb.MaChuyenBay, lb.SoHieu AS SoHieuMayBay, lb.MaLoai AS MaLoaiMayBay,
+            cb.TenSanBayDi, cb.TenSanBayDen, cb.GioDi, cb.GioDen, lb.NgayDi
+        FROM ChuyenBay cb
+        INNER JOIN LichBay lb ON cb.MaChuyenBay = lb.MaChuyenBay
+        """
+        cursor.execute(query)
+        flight_info = cursor.fetchall()
+        
+        flights = []
+        for row in flight_info:
+            flights.append({
+                "MaChuyenBay": row.MaChuyenBay.strip() if row.MaChuyenBay else None,
+                "SoHieuMayBay": row.SoHieuMayBay.strip() if row.SoHieuMayBay else None,
+                "MaLoaiMayBay": row.MaLoaiMayBay if row.MaLoaiMayBay else None,
+                "TenSanBayDi": row.TenSanBayDi,
+                "TenSanBayDen": row.TenSanBayDen,
+                "GioDi": row.GioDi.strftime("%Y-%m-%d %H:%M:%S") if row.GioDi else None,
+                "GioDen": row.GioDen.strftime("%Y-%m-%d %H:%M:%S") if row.GioDen else None,
+                "NgayDi": row.NgayDi.strftime("%Y-%m-%d") if row.NgayDi else None
+            })
+        print(f"Flights data: {flights}")
+        return jsonify(flights)
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"error": "An error occurred while fetching flight data"}), 500
+    
+@app.route('/api/search', methods=['GET'])
+def search_flights():
+    query = request.args.get('query')
+    search_type = request.args.get('type')  # 'flight' hoặc 'airport'
+
+    try:
+        if search_type == 'flight':
+            sql_query = "SELECT * FROM ChuyenBay WHERE MaChuyenBay LIKE ?"
+            cursor.execute(sql_query, ('%' + query + '%',))
+        else:  # airport
+            sql_query = "SELECT * FROM ChuyenBay WHERE TenSanBayDi LIKE ? OR TenSanBayDen LIKE ?"
+            cursor.execute(sql_query, ('%' + query + '%', '%' + query + '%'))
+
+        results = cursor.fetchall()
+        
+        flights = []
+        for row in results:
+            flights.append({
+                "MaChuyenBay": row.MaChuyenBay.strip(),
+                "TenSanBayDi": row.TenSanBayDi,
+                "TenSanBayDen": row.TenSanBayDen,
+                "GioDi": row.GioDi.strftime("%Y-%m-%d %H:%M:%S") if row.GioDi else None,
+                "GioDen": row.GioDen.strftime("%Y-%m-%d %H:%M:%S") if row.GioDen else None
+            })
+        
+        return jsonify(flights)
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"error": "An error occurred while searching flights"}), 500
+    
+@app.route('/api/book', methods=['POST'])
+def book_flight():
+    data = request.json
+    customer_id = data.get('customerId')
+    flight_id = data.get('flightId')
+    departure_date = data.get('departureDate')
+
+    try:
+        # Thực hiện đặt chỗ trong cơ sở dữ liệu
+        query = "INSERT INTO DatCho (MaKH, MaChuyenBay, NgayDi) VALUES (?, ?, ?)"
+        cursor.execute(query, (customer_id, flight_id, departure_date))
+        conn.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/them_cb', methods=['POST'])
 def them_cb():
@@ -719,4 +830,4 @@ def xoa_phan_cong(customer_id, departure_date, flight_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)

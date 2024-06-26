@@ -31,7 +31,7 @@
         <div class="spinner">
           <img src="images/wings.png" alt="Avatar" class="avatar">
         </div>
-        
+         
     </div>
     <header>
         <div class="headerdiv">
@@ -80,52 +80,52 @@
         </div>
     </header>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var modal = document.getElementById("languageModal");
-        var btn = document.getElementById("languageSelector");
-        var span = document.getElementsByClassName("close")[0];
-        var applyBtn = document.getElementById("applyChoice");
+        document.addEventListener('DOMContentLoaded', function() {
+            var modal = document.getElementById("languageModal");
+            var btn = document.getElementById("languageSelector");
+            var span = document.getElementsByClassName("close")[0];
+            var applyBtn = document.getElementById("applyChoice");
 
-        btn.onclick = function(e) {
-            e.preventDefault();
-            modal.style.display = "block";
-        }
+            btn.onclick = function(e) {
+                e.preventDefault();
+                modal.style.display = "block";
+            }
 
-        span.onclick = function() {
-            modal.style.display = "none";
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
+            span.onclick = function() {
                 modal.style.display = "none";
             }
-        }
 
-        applyBtn.onclick = function() {
-            var country = document.getElementById("country");
-            var language = document.getElementById("language");
-            var displayText = country.options[country.selectedIndex].text + " - " + 
-                            language.options[language.selectedIndex].text;
-            btn.textContent = displayText;
-            modal.style.display = "none";
-        }
-
-        document.getElementById("helpLink").onclick = function(event) {
-            event.preventDefault();
-            alert("Chào mừng bạn đến với Sân bay Trực tuyến!\n\n### Giới thiệu\nSân bay Trực tuyến là nền tảng giúp bạn quản lý và đặt vé máy bay một cách dễ dàng và thuận tiện. Hãy khám phá các tính năng và dịch vụ mà chúng tôi cung cấp để có một trải nghiệm đi bay tuyệt vời!\n\n### Các tính năng chính\n- Đặt chỗ và quản lý chuyến bay của bạn.\n- Xem thông tin chi tiết về lịch trình chuyến bay và sân bay.\n- Hỗ trợ trực tuyến để giải đáp mọi thắc mắc của bạn.\n- Thông tin chi tiết về các dịch vụ và tiện ích tại sân bay.\n\n### Các câu hỏi thường gặp (FAQ)\n**Làm thế nào để đặt vé máy bay?**\nĐể đặt vé máy bay trên Sân bay Trực tuyến, bạn có thể truy cập vào phần đặt chỗ và làm theo các bước hướng dẫn trên màn hình.\n\n**Tôi có thể thay đổi lịch trình chuyến bay như thế nào?**\nBạn có thể thay đổi lịch trình chuyến bay bằng cách truy cập vào phần quản lý chuyến bay và chọn chức năng sửa đổi lịch trình.\n\n### Liên hệ và Hỗ trợ\nNếu bạn cần thêm thông tin hoặc hỗ trợ, vui lòng liên hệ với chúng tôi qua email support@sanbaytructuyen.com hoặc gọi số hotline: 0123 456 789");
-        }
-
-
-        function showContainer(containerId) {
-            document.querySelectorAll('.container').forEach(container => {
-                container.style.display = 'none';
-            });
-            if (containerId === 'booking') {
-                document.getElementById('booking-container').style.display = 'block';
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
             }
-        }
-    });
 
+            applyBtn.onclick = function() {
+                var country = document.getElementById("country");
+                var language = document.getElementById("language");
+                var displayText = country.options[country.selectedIndex].text + " - " + 
+                                language.options[language.selectedIndex].text;
+                btn.textContent = displayText;
+                modal.style.display = "none";
+            }
+
+            document.getElementById("helpLink").onclick = function(event) {
+                event.preventDefault();
+                alert("Chào mừng bạn đến với Sân bay Trực tuyến!\n\n### Giới thiệu\nSân bay Trực tuyến là nền tảng giúp bạn quản lý và đặt vé máy bay một cách dễ dàng và thuận tiện. Hãy khám phá các tính năng và dịch vụ mà chúng tôi cung cấp để có một trải nghiệm đi bay tuyệt vời!\n\n### Các tính năng chính\n- Đặt chỗ và quản lý chuyến bay của bạn.\n- Xem thông tin chi tiết về lịch trình chuyến bay và sân bay.\n- Hỗ trợ trực tuyến để giải đáp mọi thắc mắc của bạn.\n- Thông tin chi tiết về các dịch vụ và tiện ích tại sân bay.\n\n### Các câu hỏi thường gặp (FAQ)\n**Làm thế nào để đặt vé máy bay?**\nĐể đặt vé máy bay trên Sân bay Trực tuyến, bạn có thể truy cập vào phần đặt chỗ và làm theo các bước hướng dẫn trên màn hình.\n\n**Tôi có thể thay đổi lịch trình chuyến bay như thế nào?**\nBạn có thể thay đổi lịch trình chuyến bay bằng cách truy cập vào phần quản lý chuyến bay và chọn chức năng sửa đổi lịch trình.\n\n### Liên hệ và Hỗ trợ\nNếu bạn cần thêm thông tin hoặc hỗ trợ, vui lòng liên hệ với chúng tôi qua email support@sanbaytructuyen.com hoặc gọi số hotline: 0123 456 789");
+            }
+
+
+            function showContainer(containerId) {
+                document.querySelectorAll('.container').forEach(container => {
+                    container.style.display = 'none';
+                });
+                if (containerId === 'booking') {
+                    document.getElementById('booking-container').style.display = 'block';
+                }
+            }
+        });
+        
     </script>
 
     <!-- <h2 class="w3-center">Trình Chiếu Hình Ảnh</h2> -->
@@ -200,85 +200,37 @@
   <!-- New Small Box Section -->
  
     <div class="navbar">
-        <div onclick="showContainer('booking')">ĐĂNG KÝ KHÁCH HÀNG</div>
-        <div onclick="showContainer('manage')">ĐẶT CHỖ</div>
-        <div onclick="showContainer('checkin')">TRA CỨU CHUYẾN BAY, LỊCH BAY</div>
+        <div id="nav-booking" onclick="showContainer('booking')">ĐĂNG KÝ KHÁCH HÀNG</div>
+        <div id="nav-manage" onclick="showContainer('manage')">ĐẶT CHỖ</div>
+        <div id="nav-checkin" onclick="showContainer('checkin')">TRA CỨU CHUYẾN BAY, LỊCH BAY</div>
     </div>
     <div class="overlay1" id="overlay1"></div>
     <!-- Đăng ký khách hàng -->
     <div class="container" id="booking-container" style="display: none;">
         <form id="customer-form">
-            <div class="form-group">
-                <label for="customer-id">Mã khách hàng</label>
-                <input type="text" id="customer-id" name="customer-id" readonly>
-            </div>    
-            <div class="form-group">
-                <label for="customer-phone">Số điện thoại</label>
-                <input type="tel" id="customer-phone" name="customer-phone" pattern="[0-9]{10}" required>
-            </div>
-            <div class="form-group">
-                <label for="customer-last-name">Họ đệm</label>
-                <input type="text" id="customer-last-name" name="customer-last-name" required>
-            </div>
-            <div class="form-group">
-                <label for="customer-first-name">Tên khách hàng</label>
-                <input type="text" id="customer-first-name" name="customer-first-name" required>
-            </div>
-            <div class="form-group">
-                <label for="customer-address">Địa chỉ</label>
-                <input type="text" id="customer-address" name="customer-address" required>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="customer-id">Mã khách hàng</label>
+                    <input type="text" id="customer-id" name="customer-id" readonly>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="customer-phone">Số điện thoại</label>
+                    <input type="tel" id="customer-phone" name="customer-phone" pattern="[0-9]{10}" required>
+                    <label for="customer-address">Địa chỉ</label>
+                    <input type="text" id="customer-address" name="customer-address" required>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="customer-last-name">Họ đệm</label>
+                    <input type="text" id="customer-last-name" name="customer-last-name" required>
+                    <label for="customer-first-name">Tên khách hàng</label>
+                    <input type="text" id="customer-first-name" name="customer-first-name" required>
+                </div>
             </div>
             <div class="form-group">
                 <button type="submit" style="width: 150px;">Đăng ký</button>
             </div>
         </form>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('customer-form');
-            const manageContainer = document.getElementById('manage-container');
-            const API_BASE_URL = 'http://127.0.0.1:5000'; 
-
-            // Lấy mã khách hàng mới từ server khi trang được tải
-            fetchNextCustomerId();
-
-            function fetchNextCustomerId() {
-                fetch(`${API_BASE_URL}/next_customer_id`)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('customer-id').value = data.next_customer_id;
-                    })
-                    .catch(error => console.error('Error:', error));
-            }
-
-            // Xử lý submit form
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                fetch(`${API_BASE_URL}/them_kh_fe`, {
-                    method: 'POST',
-                    body: new FormData(this)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        // Điền mã khách hàng vào form đặt chỗ
-                        document.getElementById('manage-customer-id').value = document.getElementById('customer-id').value;
-                        // Hiển thị form đặt chỗ
-                        manageContainer.style.display = 'block';
-                        // Không gọi fetchNextCustomerId() ở đây để giữ nguyên mã khách hàng
-                    } else {
-                        alert('Có lỗi xảy ra: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi gửi yêu cầu');
-                });
-            });
-        });
-    </script>
 
 <!-- ĐẶT CHỖ -->
     <div class="container" id="manage-container" style="display: none;">
@@ -298,45 +250,230 @@
             <button style="width: 150px;">Đặt chỗ</button>
         </div>
     </div>
+
     <!-- TRA CỨU CHUYẾN BAY, LỊCH BAY -->
+    
     <div class="container" id="checkin-container" style="display: none;">
-        <form action="/search" method="GET">
+        <form id="search-flight-form">
             <p>Tìm kiếm mã chuyến bay:</p>
-            <input type="text" name="query" placeholder="Nhập từ khóa tìm kiếm..." required>
+            <input type="text" name="query" placeholder="Nhập từ khóa tìm kiếm VD: CB0000001..." required>
+            <input type="hidden" name="type" value="flight">
             <button type="submit" style="background:#007BFF; border-style: none; color:hsl(0, 100%, 99%);  border-radius: 5px;  padding: 5px">Tìm kiếm</button>
         </form>
-        <form action="/search" method="GET">
+        <form id="search-airport-form">
             <p>Tìm kiếm sân bay:</p>
-            <input type="text" name="query" placeholder="Nhập từ khóa tìm kiếm..." required>
+            <input type="text" name="query" placeholder="Nhập từ khóa tìm kiếm VD: Sân Bay Nội Bài..." required>
+            <input type="hidden" name="type" value="airport">
             <button type="submit" style="background:#007BFF; border-style: none; color:#ffffff;  border-radius: 5px;  padding: 5px">Tìm kiếm</button>
         </form>
-        <table>
-            <tbody style="max-width:10px">
-                <tr >
-                    <th>Mã chuyến bay</th>
-                    <th>Số hiệu máy bay</th>
-                    <th>Mã loại máy bay</th>
-                    <th>Hãng sản xuất</th>
-                    <th>Sân bay đi</th>
-                    <th>Giờ đi</th>
-                    <th>Giờ đến</th>
-                </tr>
-                <!-- <tbody>
-                    {% for row in flight_info %} -->
-                <tr>
-                    <td>{{ row.MaChuyenBay }}</td>
-                    <td>{{ row.SoHieuMayBay }}</td>
-                    <td>{{ row.MaLoaiMayBay }}</td>
-                    <td>{{ row.HangSanXuat }}</td>
-                    <td>{{ row.SanBayDi }}</td>
-                    <td>{{ row.GioDi }}</td>
-                    <td>{{ row.GioDen }}</td>
-                </tr>
-                    <!-- {% endfor %}
-            </tbody> -->
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table id="flight-table">
+                <thead>
+                    <tr>
+                        <th>Mã chuyến bay</th>
+                        <th>Số hiệu máy bay</th>
+                        <th>Mã loại máy bay</th>
+                        <th>Sân bay đi</th>
+                        <th>Sân bay đến</th>
+                        <th>Ngày và giờ đi</th>
+                        <th>Ngày và giờ đến</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dữ liệu sẽ được thêm vào đây bằng JavaScript -->
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const API_BASE_URL = 'http://127.0.0.1:5000';
+        const bookingContainer = document.getElementById('booking-container');
+        const manageContainer = document.getElementById('manage-container');
+        const checkinContainer = document.getElementById('checkin-container');
+    
+        // Thêm event listeners cho navbar
+        document.getElementById('nav-booking').addEventListener('click', () => showContainer('booking'));
+        document.getElementById('nav-manage').addEventListener('click', () => showContainer('manage'));
+        document.getElementById('nav-checkin').addEventListener('click', () => showContainer('checkin'));
+    
+        function showContainer(containerName) {
+            bookingContainer.style.display = 'none';
+            manageContainer.style.display = 'none';
+            checkinContainer.style.display = 'none';
+    
+            switch(containerName) {
+                case 'booking':
+                    bookingContainer.style.display = 'block';
+                    initializeBooking();
+                    break;
+                case 'manage':
+                    manageContainer.style.display = 'block';
+                    initializeManage();
+                    break;
+                case 'checkin':
+                    checkinContainer.style.display = 'block';
+                    initializeCheckin();
+                    break;
+            }
+        }
+    
+        function initializeBooking() {
+            const form = document.getElementById('customer-form');
+    
+            fetchNextCustomerId();
+    
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                fetch(`${API_BASE_URL}/them_kh_fe`, {
+                    method: 'POST',
+                    body: new FormData(this)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        document.getElementById('manage-customer-id').value = document.getElementById('customer-id').value;
+                        showContainer('manage');
+                    } else {
+                        alert('Có lỗi xảy ra: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi gửi yêu cầu');
+                });
+            });
+        }
+    
+        function fetchNextCustomerId() {
+            fetch(`${API_BASE_URL}/next_customer_id`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('customer-id').value = data.next_customer_id;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    
+        function initializeManage() {
+            document.getElementById('book-flight').addEventListener('click', bookFlight);
+        }
+    
+        function bookFlight() {
+            const customerId = document.getElementById('manage-customer-id').value;
+            const flightId = document.getElementById('manage-flight-id').value;
+            const departureDate = document.getElementById('manage-departure-date').value;
+    
+            fetch(`${API_BASE_URL}/api/book`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    customerId: customerId,
+                    flightId: flightId,
+                    departureDate: departureDate
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Đặt chỗ thành công!');
+                } else {
+                    alert('Đặt chỗ thất bại: ' + data.error);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Đã xảy ra lỗi khi đặt chỗ');
+            });
+        }
+    
+        function initializeCheckin() {
+            const tableBody = document.querySelector('#flight-table tbody');
+            
+            tableBody.innerHTML = '<tr><td colspan="7">Đang tải dữ liệu...</td></tr>';
+
+            fetch(`${API_BASE_URL}/api/flights`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayFlights(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    tableBody.innerHTML = '<tr><td colspan="7">Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.</td></tr>';
+                });
+
+            document.getElementById('search-flight-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const query = this.querySelector('input[name="query"]').value;
+                performSearch('flight', query);
+            });
+
+            document.getElementById('search-airport-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const query = this.querySelector('input[name="query"]').value;
+                performSearch('airport', query);
+            });
+        }
+
+        function performSearch(type, query) {
+            const tableBody = document.querySelector('#flight-table tbody');
+            const rows = tableBody.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (type === 'flight') {
+                    const flightCode = cells[0].textContent;
+                    row.style.display = flightCode.toLowerCase().includes(query.toLowerCase()) ? '' : 'none';
+                } else if (type === 'airport') {
+                    const departureAirport = cells[3].textContent;
+                    const arrivalAirport = cells[4].textContent;
+                    row.style.display = 
+                        departureAirport.toLowerCase().includes(query.toLowerCase()) ||
+                        arrivalAirport.toLowerCase().includes(query.toLowerCase()) ? '' : 'none';
+                }
+            });
+        }
+
+        function displayFlights(flights) {
+            const tableBody = document.querySelector('#flight-table tbody');
+            tableBody.innerHTML = ''; // Xóa nội dung cũ
+            
+            if (flights.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="7">Không có dữ liệu</td>';
+                tableBody.appendChild(row);
+            } else {
+                flights.forEach(flight => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${flight.MaChuyenBay || 'N/A'}</td>
+                        <td>${flight.SoHieuMayBay || 'N/A'}</td>
+                        <td>${flight.MaLoaiMayBay || 'N/A'}</td>
+                        <td>${flight.TenSanBayDi || 'N/A'}</td>
+                        <td>${flight.TenSanBayDen || 'N/A'}</td>
+                        <td>${flight.GioDi || 'N/A'}</td>
+                        <td>${flight.GioDen || 'N/A'}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+    });
+    </script>
 
     <script>
         function showContainer(containerId) {
@@ -829,7 +966,7 @@
          <div  class="header1">
             <img src="images/Remove-bg.ai_1719194895104.png" alt="h">
             <span>
-                Wings Airlines tự hào là Hãng hàng không quốc tế 4 sao <br>
+                Wings Airport tự hào là Sân bay không quốc tế 4 sao <br>
                 Xin trân trọng cảm ơn sự đồng hành của Quý khách và bạn hàng!
             </span>
         </div>
@@ -865,7 +1002,7 @@
                 <a href="#" onclick="showAlert('Tải ứng dụng di động của Wings Airlines')">Ứng Dụng Di Động</a>
             </div>
             <div class="footer-column">
-                <h3 style="color: rgb(255, 187, 0)">Vận Tải Hàng</h3>
+                <h3 style="color: rgb(255, 187, 0)">Vận Tải</h3>
                 <a href="#" onclick="showAlert('Thông tin về dịch vụ vận chuyển hàng hóa')">Trang Web Hàng Hoá</a>
             </div>
             <div class="footer-column">

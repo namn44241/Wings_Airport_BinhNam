@@ -275,24 +275,58 @@ button:hover {
     background-color: #0078d7; /* Darker blue when active or hovered */
 }
 .container {
-    padding: 20px; /* Adjusted padding to align with table */
+    padding: 20px;
     background-color: #fff;
     max-width: 1200px;
     margin: 20px auto;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    display: none; /* Initially hidden */
+    display: none;
+}
+.table-container {
+    max-height: 375px; 
+    overflow-y: auto;
+}
+#flight-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#flight-table th,
+#flight-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+#flight-table thead {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
 }
 
 .container.active {
-    display: block; /* Show when active class is added */
+    display: block; 
 }
 
 .container h2 {
     margin-top: 0;
 }
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 1rem;
+}
+
+.col-md-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+    padding-right: 15px;
+    padding-left: 15px;
 }
 
 .form-group input,
