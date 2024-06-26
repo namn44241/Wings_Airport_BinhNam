@@ -278,11 +278,11 @@ def admin():
                            stats= stats)
 
 # Cấu hình Flask-Mail
-app.config['MAIL_SERVER'] = 'smtp.example.com'
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'your-email@example.com'
-app.config['MAIL_PASSWORD'] = 'your-password'
+app.config['MAIL_USERNAME'] = 'wingsairport73@gmail.com'
+app.config['MAIL_PASSWORD'] = 'hhma ernj xofx geks'
 
 mail = Mail(app)
 
@@ -293,24 +293,64 @@ def send_email():
     language = data.get('language')
     full_name = data.get('fullName')
 
-    if language == 'vi':
+    print(f"Received language: {language}")
+
+    if language == 'tieng-viet':
         subject = 'Xác nhận đăng ký Wings Airport'
-        body = f'Xin chào {full_name}, đây là Wings Airport, chúc bạn ngày mới tốt lành'
-    else:
+        html_body = f'''
+        <html>
+            <body>
+                <h1>Xin chào {full_name},</h1>
+                <h3>Đây là Wings Airport, chúc bạn ngày mới tốt lành!</h3>
+                <img width="480" height="269" src="https://media.giphy.com/media/S2IfEQqgWc0AH4r6Al/giphy.gif" alt="hello">
+                <p>Wings Airport tự hào là Sân bay hàng không quốc tế 4 sao<br>
+                    Xin trân trọng cảm ơn sự đồng hành của Quý khách và bạn hàng!</p>
+                <p>Trân trọng,<br>Đội ngũ Wings Airport</p>
+            </body>
+        </html>
+        '''
+    elif language == 'english':
         subject = 'Wings Airport Subscription Confirmation'
-        body = f'Hello {full_name}, this is Wings Airport, have a great day'
+        html_body = f'''
+        <html>
+            <body>
+                <h1>Hello {full_name},</h1>
+                <h3>This is Wings Airport, have a great day!</h3>
+                <img width="480" height="269" src="https://media.giphy.com/media/S2IfEQqgWc0AH4r6Al/giphy.gif" alt="hello">
+                <p>Wings Airport is proud to be a 4-star non-international airport.<br>
+                    We sincerely thank our valued customers and partners for their support!</p>
+                <p>Best regards,<br>Wings Airport Team</p>
+            </body>
+        </html>
+        '''
+    else:
+        print(f"Không nhận ra ngôn ngữ: {language}")
+        # Xử lý mặc định, ví dụ sử dụng tiếng Anh
+        subject = 'Wings Airport Subscription Confirmation'
+        html_body = f'''
+        <html>
+            <body>
+                <h1>Hello {full_name},</h1>
+                <h3>This is Wings Airport, have a great day!</h3>
+                <img width="480" height="269" src="https://media.giphy.com/media/S2IfEQqgWc0AH4r6Al/giphy.gif" alt="hello">
+                <p>Wings Airport is proud to be a 4-star non-international airport.<br>
+                    We sincerely thank our valued customers and partners for their support!</p>
+                <p>Best regards,<br>Wings Airport Team</p>
+            </body>
+        </html>
+        '''
 
     try:
         msg = Message(subject,
-                      sender='noreply@wingsairport.com',
+                      sender='wingsairport73@gmail.com',
                       recipients=[email])
-        msg.body = body
+        msg.html = html_body
         mail.send(msg)
         return jsonify({"success": True}), 200
     except Exception as e:
         print(f"Error sending email: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
-
+    
 @app.route('/api/flights', methods=['GET'])
 def get_flights():
     try:

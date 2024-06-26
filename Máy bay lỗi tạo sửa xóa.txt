@@ -1,0 +1,9 @@
+Máy bay lỗi tạo sửa xóa
+chuyến bay giờ đến nhỏ hơn giờ đi vẫn nhận
+chuyến bay tạo chuyến bay phải lớn hơn giờ hiện tại
+Lịch bay chỉ có view xem bản ghi thôi không thêm sửa xóa
+Đặt chỗ form thêm sửa bị lỗi chưa chạy
+form ngày đi lịch bay lỗi
+phân công sai csdl, thiếu nhân viên
+ngày đi của nhân viên để vậy thôi ok rồi
+

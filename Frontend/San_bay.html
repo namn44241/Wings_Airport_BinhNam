@@ -759,137 +759,137 @@
 
     <br><div class="dropdown-note" style="text-align: center; font-size: 11px;">*Giá vé hiển thị được thu thập trong vòng 48 giờ và có thể không còn hiệu lực tại thời điểm đặt chỗ. Chúng tôi có thể thu thêm phí và lệ phí cho một số sản phẩm và dịch vụ.</div>
 
-        <div class="section-title">
-            <span>Thông tin nổi bật</span>
-        </div>
-        
-        <!-- slide chuyển cảnh -->
-        <div class="slider-container">
-            <div class="slider">
-                <div class="slide">
-                    <a href="https://www.vietnamairlines.com/vn/vi/plan-book/experience/business-class/meals-and-drinks-intro" target="_blank">
-                        <img src="images/image9.png" alt="Image 1">
-                        <div class="text">Ẩm thực trên mây hạng Thương gia</div>
-                    </a>
-                </div>
-                <div class="slide">
-                    <a href="https://www.vietnamairlines.com/vn/vi/plan-book/experience/premium-economy-class/meals-and-drinks-intro" target="_blank">
-                        <img src="images/image10.png" alt="Image 2">
-                        <div class="text">Ẩm thực hạng Phổ thông đặc biệt</div>
-                    </a>
-                </div>
-                <div class="slide">
-                    <a href="https://www.vietnamairlines.com/vn/vi/plan-book/experience/economy-class/meals-and-drinks-intro" target="_blank">
-                        <img src="images/image11.png" alt="Image 3">
-                        <div class="text">Ẩm thực hạng Phổ thông</div>
-                    </a>
-                </div>
-                <div class="slide">
-                    <a href="https://www.vietnamairlines.com/vn/vi/plan-book/experience/business-class" target="_blank">
-                        <img src="images/image12.png" alt="Image 4">
-                        <div class="text">Hạng Thương Gia</div>
-                    </a>
-                </div>
-                <div class="slide">
-                    <a href="https://www.vietnamairlines.com/vn/vi/plan-book/experience/premium-economy-class" target="_blank">
-                        <img src="images/image13.png" alt="Image 5">
-                        <div class="text">Hạng Phổ Thông Đặc Biệt</div>
-                    </a>
-                </div>
-                <div class="slide">
-                    <a href="https://www.vietnamairlines.com/vn/vi/plan-book/experience/entertainment" target="_blank">
-                        <img src="images/image14.png" alt="Image 6">
-                        <div class="text">Dịch vụ trên không</div>
-                    </a>
-                </div>
+    <div class="section-title">
+        <span>Thông tin nổi bật</span>
+    </div>
+    
+    <!-- slide chuyển cảnh -->
+    <div class="slider-container">
+        <div class="slider">
+            <div class="slide">
+                <a href="https://www.vietnamairlines.com/vn/vi/plan-book/experience/business-class/meals-and-drinks-intro" target="_blank">
+                    <img src="images/image9.png" alt="Image 1">
+                    <div class="text">Ẩm thực trên mây hạng Thương gia</div>
+                </a>
+            </div>
+            <div class="slide">
+                <a href="https://www.vietnamairlines.com/vn/vi/plan-book/experience/premium-economy-class/meals-and-drinks-intro" target="_blank">
+                    <img src="images/image10.png" alt="Image 2">
+                    <div class="text">Ẩm thực hạng Phổ thông đặc biệt</div>
+                </a>
+            </div>
+            <div class="slide">
+                <a href="https://www.vietnamairlines.com/vn/vi/plan-book/experience/economy-class/meals-and-drinks-intro" target="_blank">
+                    <img src="images/image11.png" alt="Image 3">
+                    <div class="text">Ẩm thực hạng Phổ thông</div>
+                </a>
+            </div>
+            <div class="slide">
+                <a href="https://www.vietnamairlines.com/vn/vi/plan-book/experience/business-class" target="_blank">
+                    <img src="images/image12.png" alt="Image 4">
+                    <div class="text">Hạng Thương Gia</div>
+                </a>
+            </div>
+            <div class="slide">
+                <a href="https://www.vietnamairlines.com/vn/vi/plan-book/experience/premium-economy-class" target="_blank">
+                    <img src="images/image13.png" alt="Image 5">
+                    <div class="text">Hạng Phổ Thông Đặc Biệt</div>
+                </a>
+            </div>
+            <div class="slide">
+                <a href="https://www.vietnamairlines.com/vn/vi/plan-book/experience/entertainment" target="_blank">
+                    <img src="images/image14.png" alt="Image 6">
+                    <div class="text">Dịch vụ trên không</div>
+                </a>
             </div>
         </div>
-        
-        <div class="dots1"></div>
-        
-        <style>
-        .slide {
-            transition: transform 0.3s ease;
+    </div>
+    
+    <div class="dots1"></div>
+    
+    <style>
+    .slide {
+        transition: transform 0.3s ease;
+    }
+    .slide:hover {
+        transform: scale(1.05);
+    }
+    </style>
+    
+    <script>
+        const slides1 = document.querySelectorAll('.slide');
+        const slider = document.querySelector('.slider');
+        const dotsContainer1 = document.querySelector('.dots1');
+        let currentSlide = 0;
+        const slidesPerPage = 3;
+    
+        // Create dots dynamically
+        const numDots = Math.ceil(slides1.length / slidesPerPage);
+        for (let i = 0; i < numDots; i++) {
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            if (i === 0) {
+                dot.classList.add('active');
+            }
+            dotsContainer1.appendChild(dot);
         }
-        .slide:hover {
-            transform: scale(1.05);
-        }
-        </style>
-        
-        <script>
-            const slides1 = document.querySelectorAll('.slide');
-            const slider = document.querySelector('.slider');
-            const dotsContainer1 = document.querySelector('.dots1');
-            let currentSlide = 0;
-            const slidesPerPage = 3;
-        
-            // Create dots dynamically
-            const numDots = Math.ceil(slides1.length / slidesPerPage);
-            for (let i = 0; i < numDots; i++) {
-                const dot = document.createElement('span');
-                dot.classList.add('dot');
-                if (i === 0) {
-                    dot.classList.add('active');
-                }
-                dotsContainer1.appendChild(dot);
-            }
-        
-            const dots1 = document.querySelectorAll('.dot');
-        
-            function showSlide(n) {
-                currentSlide = n;
-                const slideWidth = slides1[0].offsetWidth + 20; // Including margin
-                const maxTranslate = -(Math.floor((slides1.length - 1) / slidesPerPage) * slidesPerPage * slideWidth);
-                let translateX = -n * slidesPerPage * slideWidth;
-                
-                // Ensure we don't translate beyond the last set of slides
-                translateX = Math.max(maxTranslate, Math.min(0, translateX));
-                
-                slider.style.transform = `translateX(${translateX}px)`;
-                
-                dots1.forEach((dot, index) => {
-                    dot.classList.toggle('active', index === n);
-                });
-            }
-        
-            function nextSlide() {
-                currentSlide = (currentSlide + 1) % numDots;
-                showSlide(currentSlide);
-            }
-        
-            showSlide(currentSlide);
-        
-            let slideInterval = setInterval(nextSlide, 5000);
-        
+    
+        const dots1 = document.querySelectorAll('.dot');
+    
+        function showSlide(n) {
+            currentSlide = n;
+            const slideWidth = slides1[0].offsetWidth + 20; // Including margin
+            const maxTranslate = -(Math.floor((slides1.length - 1) / slidesPerPage) * slidesPerPage * slideWidth);
+            let translateX = -n * slidesPerPage * slideWidth;
+            
+            // Ensure we don't translate beyond the last set of slides
+            translateX = Math.max(maxTranslate, Math.min(0, translateX));
+            
+            slider.style.transform = `translateX(${translateX}px)`;
+            
             dots1.forEach((dot, index) => {
-                dot.addEventListener('click', () => {
-                    clearInterval(slideInterval);
-                    showSlide(index);
-                    slideInterval = setInterval(nextSlide, 5000); // Restart interval
-                });
+                dot.classList.toggle('active', index === n);
             });
-        </script>
+        }
+    
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % numDots;
+            showSlide(currentSlide);
+        }
+    
+        showSlide(currentSlide);
+    
+        let slideInterval = setInterval(nextSlide, 5000);
+    
+        dots1.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                clearInterval(slideInterval);
+                showSlide(index);
+                slideInterval = setInterval(nextSlide, 5000); // Restart interval
+            });
+        });
+    </script>
         
         <!-- xoay xoay -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(function() {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+            document.getElementById('preloader').classList.add('hidden');
+            document.body.classList.add('loaded');
+            }, 3000);
+        });
+        
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+            if (!document.body.classList.contains('loaded')) {
                 document.getElementById('preloader').classList.add('hidden');
                 document.body.classList.add('loaded');
-                }, 3000);
-            });
-            
-            window.addEventListener('load', function() {
-                setTimeout(function() {
-                if (!document.body.classList.contains('loaded')) {
-                    document.getElementById('preloader').classList.add('hidden');
-                    document.body.classList.add('loaded');
-                }
-                }, 500);
-            });
-        </script>
+            }
+            }, 500);
+        });
+    </script>
       
-      <div class="section-title">
+    <div class="section-title">
         <span>Đăng ký E-Newsletter</span>
     </div>
     <p style="text-align:center;">Đăng ký E-Newsletter để cập nhật các thông tin, ưu đãi mới nhất. (Không bao gồm các thông tin, ưu đãi từ chương trình Bông Sen Vàng)</p>
@@ -902,10 +902,10 @@
             <div id="additional-fields" style="display: none;">
                 <div class="form-group">
                     <label for="language">Ngôn ngữ</label>
-                    <select id="language" name="language">
-                        <option value="vi">Tiếng Việt</option>
-                        <option value="en">English</option>
-                    </select>
+                        <select id="language" name="language">
+                            <option value="tieng-viet">Tiếng Việt</option>
+                            <option value="english">English</option>
+                        </select>
                 </div>
                 <div class="form-group">
                     <label for="salutation">Danh xưng</label>
@@ -945,31 +945,75 @@
                 <button type="submit">ĐĂNG KÝ</button>
             </div>
         </form>
-    </div>
+    </div><br>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
         var emailInput = document.getElementById('email');
         var additionalFields = document.getElementById('additional-fields');
-
+        var form = document.getElementById('newsletter-form');
+    
+        // Xử lý hiển thị/ẩn các trường bổ sung
         emailInput.addEventListener('focus', function() {
             additionalFields.style.display = 'block';
         });
-
+    
         document.addEventListener('click', function(event) {
             if (!emailInput.contains(event.target) && !additionalFields.contains(event.target)) {
                 additionalFields.style.display = 'none';
             }
         });
+    
+        // Xử lý việc gửi form
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            sendEmail();
+        });
     });
-    </script><br>
-         <div  class="header1">
-            <img src="images/Remove-bg.ai_1719194895104.png" alt="h">
-            <span>
-                Wings Airport tự hào là Sân bay không quốc tế 4 sao <br>
-                Xin trân trọng cảm ơn sự đồng hành của Quý khách và bạn hàng!
-            </span>
-        </div>
+    
+    function sendEmail() {
+        var email = document.getElementById('email').value;
+        var language = document.getElementById('language').value;
+        var lastName = document.getElementById('last_name').value;
+        var firstName = document.getElementById('first_name').value;
+        var fullName = lastName + ' ' + firstName;
+
+        console.log("Selected language:", language);
+        
+        fetch('http://127.0.0.1:5000/send-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                language: language, 
+                fullName: fullName
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Đăng ký thành công! Email xác nhận đã được gửi.');
+                document.getElementById('newsletter-form').reset();
+            } else {
+                alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
+        });
+    }
+    </script>
+
+    <div  class="header1">
+        <img src="images/Remove-bg.ai_1719194895104.png" alt="h">
+        <span>
+            Wings Airport tự hào là Sân bay hàng không quốc tế 4 sao <br>
+            Xin trân trọng cảm ơn sự đồng hành của Quý khách và bạn hàng!
+        </span>
+    </div>
 
     <footer>
         <div class="footer-container">
