@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, render_template_string, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, render_template_string, jsonify, session, flash
 import pyodbc
 import os
 from datetime import datetime
@@ -26,47 +26,51 @@ def test_connection():
         return f"Kết nối thất bại: {str(e)}"
     
 @app.route('/')
-def login():
+def check_login():
     if 'username' in session:
-        return redirect(url_for('admin'))  # Chuyển hướng nếu đã đăng nhập
+        return redirect(url_for('admin')) 
+    else:
+        return redirect(url_for('san_bay'))
     
+@app.route('/login')
+def login():     
     # Hiển thị form đăng nhập nếu chưa đăng nhập
     html = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Đăng nhập</title>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    </head>
-    <body onload="showLoginDialog()">
-        <script>
-            function showLoginDialog() {
-                Swal.fire({
-                    title: 'Đăng nhập',
-                    html: `
-                        <input id="username" class="swal2-input" placeholder="Tài khoản">
-                        <input id="password" type="password" class="swal2-input" placeholder="Mật khẩu">
-                    `,
-                    confirmButtonText: 'Đăng nhập',
-                    preConfirm: () => {
-                        const username = document.getElementById('username').value;
-                        const password = document.getElementById('password').value;
-                        if (!username || !password) {
-                            Swal.showValidationMessage('Vui lòng nhập tài khoản và mật khẩu.');
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Đăng nhập</title>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body onload="showLoginDialog()">
+            <script>
+                function showLoginDialog() {
+                    Swal.fire({
+                        title: 'Đăng nhập',
+                        html: `
+                            <input id="username" class="swal2-input" placeholder="Tài khoản">
+                            <input id="password" type="password" class="swal2-input" placeholder="Mật khẩu">
+                        `,
+                        confirmButtonText: 'Đăng nhập',
+                        preConfirm: () => {
+                            const username = document.getElementById('username').value;
+                            const password = document.getElementById('password').value;
+                            if (!username || !password) {
+                                Swal.showValidationMessage('Vui lòng nhập tài khoản và mật khẩu.');
+                            }
+                            return { username, password };
+                        },
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const { username, password } = result.value;
+                            window.location.href = `/auth?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
                         }
-                        return { username, password };
-                    },
-                    allowOutsideClick: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const { username, password } = result.value;
-                        window.location.href = `/auth?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
-                    }
-                });
-            }
-        </script>
-    </body>
-    </html>
+                    });
+                }
+            </script>
+        </body>
+        </html>
     """
     return render_template_string(html)
 
@@ -87,12 +91,16 @@ def auth():
     else:
         error_msg = "Tài khoản hoặc mật khẩu không đúng"
         return render_template_string("<script>alert('{}'); window.location.href = '/';</script>".format(error_msg))
-    
+
 
 @app.route('/logout')
 def logout():
     session.pop('username', None)
-    return redirect(url_for('login'))
+    return redirect(url_for('san_bay'))
+
+@app.route('/san_bay')
+def san_bay():
+    return render_template('san_bay.html')
 
 @app.route('/admin')
 def admin():
@@ -259,6 +267,22 @@ def admin():
         'data': [s[1] for s in nhan_vien_stats]
     }
 
+    # Thêm code để lấy dữ liệu cho quản lý lịch bay
+    flights_query = "SELECT MaChuyenBay FROM ChuyenBay"
+    aircrafts_query = "SELECT SoHieu FROM MayBay"
+    flights = cursor.execute(flights_query).fetchall()
+    aircrafts = cursor.execute(aircrafts_query).fetchall()
+
+    schedules_query = """
+    SELECT LB.MaChuyenBay, LB.SoHieu, MB.MaLoai, LMB.HangSanXuat, MB.SoGheNgoi, 
+           CB.TenSanBayDi, CB.TenSanBayDen, CB.GioDi, CB.GioDen
+    FROM LichBay LB
+    JOIN MayBay MB ON LB.SoHieu = MB.SoHieu
+    JOIN LoaiMayBay LMB ON MB.MaLoai = LMB.MaLoai
+    JOIN ChuyenBay CB ON LB.MaChuyenBay = CB.MaChuyenBay
+    """
+    schedules = cursor.execute(schedules_query).fetchall()
+
     return render_template('admin.html',
                            username=username,
                            flight_info=flight_info,
@@ -275,7 +299,10 @@ def admin():
                            next_employee_id=next_employee_id,
                            next_plane_type_id=next_plane_type_id,
                            next_flight_id=next_flight_id,
-                           stats= stats)
+                           stats=stats,
+                           flights=flights,
+                           aircrafts=aircrafts,
+                           schedules=schedules)
 
 # Cấu hình Flask-Mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -384,7 +411,7 @@ def get_flights():
 @app.route('/api/search', methods=['GET'])
 def search_flights():
     query = request.args.get('query')
-    search_type = request.args.get('type')  # 'flight' hoặc 'airport'
+    search_type = request.args.get('type') 
 
     try:
         if search_type == 'flight':
@@ -494,128 +521,75 @@ def xoa_loai_mb(plane_type_id):
 
 ### Các hàm xử lý cho quản lý ĐẶT CHỖ
 
-# Hàm kiểm tra tồn tại khách hàng
-def check_customer_exists(customer_id):
-    query = "SELECT COUNT(*) FROM KhachHang WHERE MaKH = ?"
-    cursor.execute(query, (customer_id,))
-    count = cursor.fetchone()[0]
-    return count > 0
-
-# Hàm kiểm tra tồn tại chuyến bay
-def check_flight_exists(flight_id):
-    query = "SELECT COUNT(*) FROM ChuyenBay WHERE MaChuyenBay = ?"
-    cursor.execute(query, (flight_id,))
-    count = cursor.fetchone()[0]
-    return count > 0
-
-# Hàm kiểm tra tồn tại lịch bay
-def check_flight_schedule_exists(flight_id, departure_date):
-    query = "SELECT COUNT(*) FROM LichBay WHERE MaChuyenBay = ? AND NgayDi = ?"
-    cursor.execute(query, (flight_id, departure_date))
-    count = cursor.fetchone()[0]
-    return count > 0
-
-def get_flight_dates(flight_id):
-    query = "SELECT NgayDi FROM LichBay WHERE MaChuyenBay = ?"
-    cursor.execute(query, (flight_id,))
-    result = cursor.fetchall()
-    flight_dates = [row[0] for row in result]
-    return flight_dates
-    
-def check_flight_schedule_exists(flight_id, departure_date):
-    query = "SELECT COUNT(*) FROM LichBay WHERE MaChuyenBay = ? AND NgayDi = ?"
-    cursor.execute(query, (flight_id, departure_date))
-    return cursor.fetchone()[0] > 0
-
-
-@app.route('/get_flight_details', methods=['GET'])
-def get_flight_details():
-    flight_id = request.args.get('flight_id')
-
-    # Truy vấn SQL để lấy thông tin giờ đi và giờ đến từ bảng ChuyenBay
-    query = """
-    SELECT GioDi, GioDen
-    FROM ChuyenBay
-    WHERE MaChuyenBay = ?
-    """
-    cursor.execute(query, (flight_id,))
-    flight_info = cursor.fetchone()
-
-    if flight_info:
-        departure_time = flight_info[0].isoformat()
-        arrival_time = flight_info[1].isoformat()
-        flight_details = {
-            'departure_time': departure_time,
-            'arrival_time': arrival_time
-        }
-        return jsonify(flight_details)
-    else:
-        return jsonify({'error': 'Mã chuyến bay không hợp lệ'}), 404
-
 @app.route('/them_dat_cho', methods=['POST'])
 def them_dat_cho():
     customer_id = request.form['customer-id']
     flight_id = request.form['flight-id']
+    departure_datetime = request.form['departure-datetime']
 
-    # Kiểm tra xem MaKH có tồn tại trong bảng KhachHang hay không
-    if not check_customer_exists(customer_id):
-        error_message = "Mã khách hàng không hợp lệ. Vui lòng nhập lại."
-        return render_template('admin.html', error_message=error_message)
+    try:
+        # Chuyển đổi chuỗi ngày tháng thành đối tượng datetime
+        departure_date = datetime.strptime(departure_datetime, '%Y-%m-%dT%H:%M')
+        # Định dạng lại thành chuỗi YYYY-MM-DD
+        ngay_di = departure_date.strftime('%Y-%m-%d')
 
-    # Kiểm tra xem MaChuyenBay có tồn tại trong bảng ChuyenBay hay không
-    if not check_flight_exists(flight_id):
-        error_message = "Mã chuyến bay không hợp lệ. Vui lòng nhập lại."
-        return render_template('admin.html', error_message=error_message)
+        # Kiểm tra đặt chỗ đã tồn tại
+        check_query = "SELECT COUNT(*) FROM DatCho WHERE MaKH = ? AND MaChuyenBay = ? AND NgayDi = ?"
+        cursor.execute(check_query, (customer_id, flight_id, ngay_di))
+        if cursor.fetchone()[0] > 0:
+            return jsonify({"error": "Đã tồn tại đặt chỗ cho khách hàng này trên chuyến bay này."}), 400
 
-    # Lấy thông tin GioDi và GioDen từ bảng ChuyenBay
+        # Thêm bản ghi mới
+        insert_query = "INSERT INTO DatCho (MaKH, NgayDi, MaChuyenBay) VALUES (?, ?, ?)"
+        cursor.execute(insert_query, (customer_id, ngay_di, flight_id))
+        cnxn.commit()
+        
+        return jsonify({"success": "Thêm đặt chỗ thành công"}), 200
+
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"error": f"Lỗi khi thêm đặt chỗ: {str(e)}"}), 500
+
+@app.route('/get_flight_details', methods=['GET'])
+def get_flight_details():
+    flight_id = request.args.get('flight_id')
     query = "SELECT GioDi, GioDen FROM ChuyenBay WHERE MaChuyenBay = ?"
     cursor.execute(query, (flight_id,))
-    flight_info = cursor.fetchone()
-
-    if flight_info:
-        giodi, gioden = flight_info
-
-        # Thực hiện thêm thông tin đặt chỗ vào cơ sở dữ liệu
-        query = "INSERT INTO DatCho (MaKH, MaChuyenBay, GioDi, GioDen) VALUES (?, ?, ?, ?)"
-        values = (customer_id, flight_id, giodi, gioden)
-        cursor.execute(query, values)
-        cnxn.commit()
-        return redirect(url_for('admin'))
-    else:
-        error_message = "Không tìm thấy thông tin chuyến bay. Vui lòng kiểm tra lại."
-        return render_template('admin.html', error_message=error_message)
+    result = cursor.fetchone()
+    if result:
+        return jsonify({
+            'departure_time': result.GioDi.isoformat(),
+            'arrival_time': result.GioDen.isoformat()
+        })
+    return jsonify({'error': 'Không tìm thấy chuyến bay'}), 404
 
 @app.route('/sua_dat_cho', methods=['POST'])
 def sua_dat_cho():
     customer_id = request.form['customer-id']
     flight_id = request.form['flight-id']
+    departure_datetime = request.form['departure-datetime']
 
-    # Kiểm tra xem MaKH có tồn tại trong bảng KhachHang hay không
-    if not check_customer_exists(customer_id):
-        error_message = "Mã khách hàng không hợp lệ. Vui lòng nhập lại."
-        return render_template('admin.html', error_message=error_message)
+    try:
+        # Trích xuất NgayDi từ departure_datetime
+        ngay_di = datetime.strptime(departure_datetime, '%Y-%m-%dT%H:%M').date()
 
-    # Kiểm tra xem MaChuyenBay có tồn tại trong bảng ChuyenBay hay không
-    if not check_flight_exists(flight_id):
-        error_message = "Mã chuyến bay không hợp lệ. Vui lòng nhập lại."
-        return render_template('admin.html', error_message=error_message)
+        # Cập nhật đặt chỗ
+        update_query = """
+        UPDATE DatCho 
+        SET MaChuyenBay = ?, NgayDi = ? 
+        WHERE MaKH = ?
+        """
+        cursor.execute(update_query, (flight_id, ngay_di, customer_id))
+        
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Không tìm thấy đặt chỗ để cập nhật"}), 404
 
-    # Lấy thông tin GioDi và GioDen từ bảng ChuyenBay
-    query = "SELECT GioDi, GioDen FROM ChuyenBay WHERE MaChuyenBay = ?"
-    cursor.execute(query, (flight_id,))
-    flight_info = cursor.fetchone()
-
-    if flight_info:
-        giodi, gioden = flight_info
-
-        query = "UPDATE DatCho SET MaChuyenBay = ?, GioDi = ?, GioDen = ? WHERE MaKH = ?"
-        values = (flight_id, giodi, gioden, customer_id)
-        cursor.execute(query, values)
         cnxn.commit()
-        return redirect(url_for('admin'))
-    else:
-        error_message = "Không tìm thấy thông tin chuyến bay. Vui lòng kiểm tra lại."
-        return render_template('admin.html', error_message=error_message)
+        return jsonify({"success": "Cập nhật đặt chỗ thành công"}), 200
+
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"error": f"Lỗi khi cập nhật đặt chỗ: {str(e)}"}), 500
 
 @app.route('/xoa_dat_cho', methods=['POST'])
 def xoa_dat_cho():
@@ -635,34 +609,85 @@ def xoa_dat_cho():
 
 @app.route('/them_mb', methods=['POST'])
 def them_mb():
-    plane_id = request.form['plane-id']
-    plane_type_id = request.form['plane-type-id']
-    seat_quantity = request.form['seat-quantity']
+    try:
+        plane_id = request.form['plane-id']
+        plane_type_id = request.form['plane-type-id']
+        seat_quantity = request.form['seat-quantity']
 
-    query = "INSERT INTO MayBay (SoHieu, MaLoai, SoGheNgoi) VALUES (?, ?, ?)"
-    values = (plane_id, plane_type_id, seat_quantity)
-    cursor.execute(query, values)
-    cnxn.commit()
-    return redirect(url_for('admin'))
+        # Kiểm tra độ dài của plane_id
+        if len(plane_id) > 10:
+            return jsonify({'success': False, 'message': 'Số hiệu máy bay không được vượt quá 10 ký tự'}), 400
+
+        # Kiểm tra xem máy bay đã tồn tại chưa
+        check_query = "SELECT COUNT(*) FROM MayBay WHERE SoHieu = ?"
+        cursor.execute(check_query, (plane_id,))
+        if cursor.fetchone()[0] > 0:
+            return jsonify({'success': False, 'message': 'Máy bay với số hiệu này đã tồn tại!'}), 400
+
+        # Kiểm tra xem loại máy bay có tồn tại không
+        check_type_query = "SELECT COUNT(*) FROM LoaiMayBay WHERE MaLoai = ?"
+        cursor.execute(check_type_query, (plane_type_id,))
+        if cursor.fetchone()[0] == 0:
+            return jsonify({'success': False, 'message': 'Loại máy bay không tồn tại!'}), 400
+
+        query = "INSERT INTO MayBay (SoHieu, MaLoai, SoGheNgoi) VALUES (?, ?, ?)"
+        values = (plane_id, plane_type_id, seat_quantity)
+        cursor.execute(query, values)
+        cnxn.commit()
+        return jsonify({'success': True, 'message': 'Thêm máy bay thành công'}), 201
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({'success': False, 'message': f'Lỗi khi thêm máy bay: {str(e)}'}), 500
 
 @app.route('/sua_mb', methods=['POST'])
 def sua_mb():
-    plane_id = request.form['plane-id']
-    plane_type_id = request.form['plane-type-id']
-    seat_quantity = request.form['seat-quantity']
+    try:
+        plane_id = request.form['plane-id']
+        plane_type_id = request.form['plane-type-id']
+        seat_quantity = request.form['seat-quantity']
 
-    query = "UPDATE MayBay SET MaLoai = ?, SoGheNgoi = ? WHERE SoHieu = ?"
-    values = (plane_type_id, seat_quantity, plane_id)
-    cursor.execute(query, values)
-    cnxn.commit()
-    return redirect(url_for('admin'))
+        # Kiểm tra xem máy bay có tồn tại trong bảng MayBay không
+        check_plane_query = "SELECT COUNT(*) FROM MayBay WHERE SoHieu = ?"
+        cursor.execute(check_plane_query, (plane_id,))
+        if cursor.fetchone()[0] == 0:
+            return jsonify({'success': False, 'message': 'Máy bay không tồn tại!'})
+
+        # Kiểm tra xem máy bay có trong LichBay không
+        check_schedule_query = "SELECT COUNT(*) FROM LichBay WHERE SoHieu = ?"
+        cursor.execute(check_schedule_query, (plane_id,))
+        if cursor.fetchone()[0] > 0:
+            return jsonify({'success': False, 'message': 'Không thể sửa thông tin máy bay này vì đã được sử dụng trong lịch bay!'})
+
+        # Nếu không có trong LichBay, tiến hành cập nhật
+        update_query = "UPDATE MayBay SET MaLoai = ?, SoGheNgoi = ? WHERE SoHieu = ?"
+        cursor.execute(update_query, (plane_type_id, seat_quantity, plane_id))
+        cnxn.commit()
+        
+        return jsonify({'success': True, 'message': 'Cập nhật thông tin máy bay thành công'})
+
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({'success': False, 'message': f'Lỗi khi cập nhật máy bay: {str(e)}'})
 
 @app.route('/xoa_mb/<plane_id>', methods=['POST'])
 def xoa_mb(plane_id):
-    query = "DELETE FROM MayBay WHERE SoHieu = ?"
-    cursor.execute(query, (plane_id,))
-    cnxn.commit()
-    return redirect(url_for('admin'))
+    try:
+        # Kiểm tra xem máy bay có trong LichBay không
+        check_query = "SELECT COUNT(*) FROM LichBay WHERE SoHieu = ?"
+        cursor.execute(check_query, (plane_id,))
+        count = cursor.fetchone()[0]
+
+        if count > 0:
+            return jsonify({'success': False, 'message': f'Không thể xóa máy bay {plane_id} vì đã được sử dụng trong lịch bay.'})
+        else:
+            # Nếu không có trong LichBay, tiến hành xóa
+            delete_query = "DELETE FROM MayBay WHERE SoHieu = ?"
+            cursor.execute(delete_query, (plane_id,))
+            cnxn.commit()
+            return jsonify({'success': True, 'message': f'Đã xóa máy bay {plane_id} thành công.'})
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({'success': False, 'message': f'Lỗi khi xóa máy bay: {str(e)}'})
 
 ### Các hàm xử lý cho quản lý KHÁCH HÀNG
 
@@ -776,45 +801,104 @@ def xoa_nv(employee_id):
 
 ### Các hàm xử lý cho quản lý LỊCH BAY
 
-
 @app.route('/them_lich', methods=['POST'])
 def them_lich():
     flight_id = request.form['flight-id']
     aircraft_id = request.form['aircraft-id']
-    aircraft_type_id = request.form['aircraft-type-id']
-    departure_date = request.form['departure-date']
 
-    query = "INSERT INTO LichBay (NgayDi, MaChuyenBay, SoHieu, MaLoai) VALUES (?, ?, ?, ?)"
-    values = (departure_date, flight_id, aircraft_id, aircraft_type_id)
-    cursor.execute(query, values)
-    cnxn.commit()
-    return redirect(url_for('admin'))
+    try:
+        # Truy vấn để lấy GioDi từ bảng ChuyenBay
+        query_get_giodi = "SELECT GioDi FROM ChuyenBay WHERE MaChuyenBay = ?"
+        cursor.execute(query_get_giodi, (flight_id,))
+        result = cursor.fetchone()
+
+        if result:
+            gio_di = result[0]
+            ngay_di = str(gio_di).split()[0]  # Lấy phần ngày từ datetime
+
+            # Lấy MaLoai từ bảng MayBay
+            query_get_maloai = "SELECT MaLoai FROM MayBay WHERE SoHieu = ?"
+            cursor.execute(query_get_maloai, (aircraft_id,))
+            ma_loai_result = cursor.fetchone()
+
+            if ma_loai_result:
+                ma_loai = ma_loai_result[0]
+
+                # Kiểm tra xem NgayDi và MaChuyenBay đã tồn tại chưa
+                check_query = "SELECT COUNT(*) FROM LichBay WHERE NgayDi = ? AND MaChuyenBay = ?"
+                cursor.execute(check_query, (ngay_di, flight_id))
+                if cursor.fetchone()[0] > 0:
+                    return jsonify({"error": "NgayDi và MaChuyenBay đã bị trùng lặp"}), 400
+
+                # Thêm lịch bay mới
+                query_insert = "INSERT INTO LichBay (NgayDi, MaChuyenBay, SoHieu, MaLoai) VALUES (?, ?, ?, ?)"
+                values = (ngay_di, flight_id, aircraft_id, ma_loai)
+                cursor.execute(query_insert, values)
+                cnxn.commit()
+                
+                return jsonify({"success": "Thêm lịch bay thành công"}), 200
+            else:
+                return jsonify({"error": "Không tìm thấy MaLoai cho máy bay này"}), 400
+
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"error": f"Lỗi khi thêm lịch bay: {str(e)}"}), 500
 
 @app.route('/sua_lich', methods=['POST'])
 def sua_lich():
-    schedule_id = request.form['schedule-id']
     flight_id = request.form['flight-id']
     aircraft_id = request.form['aircraft-id']
-    aircraft_type_id = request.form['aircraft-type-id']
-    departure_date = request.form['departure-date']
 
-    query = "UPDATE LichBay SET MaChuyenBay = ?, SoHieu = ?, MaLoai = ?, NgayDi = ? WHERE MaChuyenBay = ?"
-    values = (flight_id, aircraft_id, aircraft_type_id, departure_date, schedule_id)
-    cursor.execute(query, values)
-    cnxn.commit()
-    return redirect(url_for('admin'))
+    try:
+        # Kiểm tra xem lịch bay có tồn tại không
+        check_query = "SELECT COUNT(*) FROM LichBay WHERE MaChuyenBay = ?"
+        cursor.execute(check_query, (flight_id,))
+        if cursor.fetchone()[0] == 0:
+            return jsonify({"error": "Lịch bay không tồn tại"}), 400
+
+        # Cập nhật lịch bay
+        update_query = "UPDATE LichBay SET SoHieu = ? WHERE MaChuyenBay = ?"
+        cursor.execute(update_query, (aircraft_id, flight_id))
+        cnxn.commit()
+        
+        return jsonify({"success": "Cập nhật lịch bay thành công"}), 200
+    
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"error": f"Lỗi khi cập nhật lịch bay: {str(e)}"}), 500
 
 @app.route('/xoa_lich', methods=['POST'])
 def xoa_lich():
-       flight_id = request.form['flight-id']
-       aircraft_id = request.form['aircraft-id']  # Lấy giá trị từ form
-       departure_date = request.form['departure-date'] 
-       query = "DELETE FROM LichBay WHERE NgayDi = ? AND MaChuyenBay = ? AND SoHieu = ?"
-       values = (departure_date, flight_id, aircraft_id)
-       cursor.execute(query, values)
-       cnxn.commit()
-       return redirect(url_for('admin'))
-
+    flight_id = request.form['flight-id']
+    aircraft_id = request.form['aircraft-id']
+    
+    try:
+        # Kiểm tra xem MaChuyenBay có trong bảng DatCho không
+        check_datcho_query = "SELECT COUNT(*) FROM DatCho WHERE MaChuyenBay = ?"
+        cursor.execute(check_datcho_query, (flight_id,))
+        datcho_count = cursor.fetchone()[0]
+        
+        # Kiểm tra xem MaChuyenBay có trong bảng PhanCong không
+        check_phancong_query = "SELECT COUNT(*) FROM PhanCong WHERE MaChuyenBay = ?"
+        cursor.execute(check_phancong_query, (flight_id,))
+        phancong_count = cursor.fetchone()[0]
+        
+        if datcho_count > 0:
+            return jsonify({"error": "Không thể xóa. Mã chuyến bay đã được sử dụng trong bảng DatCho hoặc PhanCong."}), 400
+        
+        if phancong_count > 0:
+            return jsonify({"error": "Không thể xóa. Mã chuyến bay đã được sử dụng trong bảng PhanCong hoặc DatCho."}), 400
+        
+        # Nếu không có ràng buộc, tiến hành xóa
+        delete_query = "DELETE FROM LichBay WHERE MaChuyenBay = ? AND SoHieu = ?"
+        cursor.execute(delete_query, (flight_id, aircraft_id))
+        cnxn.commit()
+        
+        return jsonify({"success": "Xóa lịch bay thành công"}), 200
+    
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"error": f"Lỗi khi xóa lịch bay: {str(e)}"}), 500
 
 ### Các hàm xử lý cho quản lý PHÂN CÔNG
    
@@ -836,30 +920,30 @@ def them_phan_cong():
 
 @app.route('/sua_phan_cong/<customer_id>/<departure_date>/<flight_id>', methods=['GET', 'POST'])
 def sua_phan_cong(customer_id, departure_date, flight_id):
-         if request.method == 'GET':
-             # Lấy thông tin phân công hiện tại để hiển thị trong form sửa
-             query = "SELECT * FROM DatCho WHERE MaKH = ? AND NgayDi = ? AND MaChuyenBay = ?"
-             cursor.execute(query, (customer_id, departure_date, flight_id))
-             assignment_info = cursor.fetchone()
-             if assignment_info is None:
-                 return 'Phân công không tồn tại'  # Xử lý trường hợp phân công không tồn tại
- 
-             # Lấy danh sách khách hàng và chuyến bay để hiển thị trong form
-             customer_info = get_customer_info()  # Hàm lấy danh sách khách hàng
-             flight_info = get_flight_info()  # Hàm lấy danh sách chuyến bay
-             return render_template('sua_phan_cong.html', assignment_info=assignment_info, customer_info=customer_info, flight_info=flight_info)
-         elif request.method == 'POST':
-             # Lấy dữ liệu từ form sửa
-             new_customer_id = request.form['new-customer-id']
-             new_departure_date = request.form['new-departure-date']
-             new_flight_id = request.form['new-flight-id']
- 
-             # Cập nhật thông tin phân công trong database
-             query = "UPDATE DatCho SET MaKH = ?, NgayDi = ?, MaChuyenBay = ? WHERE MaKH = ? AND NgayDi = ? AND MaChuyenBay = ?"
-             values = (new_customer_id, new_departure_date, new_flight_id, customer_id, departure_date, flight_id)
-             cursor.execute(query, values)
-             conn.commit()
-             return redirect(url_for('admin')) 
+    if request.method == 'GET':
+        # Lấy thông tin phân công hiện tại để hiển thị trong form sửa
+        query = "SELECT * FROM DatCho WHERE MaKH = ? AND NgayDi = ? AND MaChuyenBay = ?"
+        cursor.execute(query, (customer_id, departure_date, flight_id))
+        assignment_info = cursor.fetchone()
+        if assignment_info is None:
+            return 'Phân công không tồn tại'  # Xử lý trường hợp phân công không tồn tại
+
+        # Lấy danh sách khách hàng và chuyến bay để hiển thị trong form
+        customer_info = get_customer_info()  # Hàm lấy danh sách khách hàng
+        flight_info = get_flight_info()  # Hàm lấy danh sách chuyến bay
+        return render_template('sua_phan_cong.html', assignment_info=assignment_info, customer_info=customer_info, flight_info=flight_info)
+    elif request.method == 'POST':
+        # Lấy dữ liệu từ form sửa
+        new_customer_id = request.form['new-customer-id']
+        new_departure_date = request.form['new-departure-date']
+        new_flight_id = request.form['new-flight-id']
+
+        # Cập nhật thông tin phân công trong database
+        query = "UPDATE DatCho SET MaKH = ?, NgayDi = ?, MaChuyenBay = ? WHERE MaKH = ? AND NgayDi = ? AND MaChuyenBay = ?"
+        values = (new_customer_id, new_departure_date, new_flight_id, customer_id, departure_date, flight_id)
+        cursor.execute(query, values)
+        conn.commit()
+        return redirect(url_for('admin')) 
 
 @app.route('/xoa_phan_cong/<customer_id>/<departure_date>/<flight_id>', methods=['POST'])
 def xoa_phan_cong(customer_id, departure_date, flight_id):

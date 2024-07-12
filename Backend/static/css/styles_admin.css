@@ -288,6 +288,8 @@ form label {
 }
 
 form input[type="text"],
+form input[type="number"],
+form select,
 .customer-id,
 .flight-id,
 .departure-date,
@@ -301,7 +303,9 @@ form input[type="datetime-local"] {
     font-size: 16px;
 }
 
-form button {
+form button,
+.button1,
+tr td button {
     padding: 12px 24px;
     background-color: #4CAF50;
     color: white;
@@ -312,7 +316,6 @@ form button {
     font-size: 16px;
     font-weight: bold;
 }
-
 form button:hover {
     background-color: #45a049;
     transform: translateY(-2px);

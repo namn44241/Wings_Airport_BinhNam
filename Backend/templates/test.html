@@ -1,69 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .content {
-            flex: 1;
-        }
-        footer {
-            background-color: #333;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-        }
-        .footer-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        .footer-left,
-        .footer-right {
-            display: flex;
-            flex-direction: column;
-        }
-        .footer-left a,
-        .footer-right a {
-            color: white;
-            text-decoration: none;
-            margin-bottom: 10px;
-        }
-        .footer-left a:hover,
-        .footer-right a:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
-    <div class="content">
-        <!-- Nội dung trang web của bạn ở đây -->
-    </div>
-    <footer>
-        <div class="footer-container">
-            <div class="footer-left">
-                <h3>About Us</h3>
-                <a href="#">Our Story</a>
-                <a href="#">Team</a>
-                <a href="#">Careers</a>
-            </div>
-            <div class="footer-right">
-                <h3>Contact Us</h3>
-                <a href="#">Email</a>
-                <a href="#">Phone</a>
-                <a href="#">Location</a>
-            </div>
-        </div>
-    </footer>
-</body>
-</html>
+<section id="schedule-info">
+    <!-- Form for managing flight schedule information -->
+    <h2>Quản lý lịch bay</h2>
+    <form method="POST" action="{{ url_for('them_lich') }}">
+        <label for="flight-id">Mã chuyến bay:</label>
+        <input type="text" id="flight-id" name="flight-id" placeholder="Mã Chuyến bay" required><br>
+        <label for="aircraft-id">Số hiệu máy bay:</label>
+        <input type="text" id="aircraft-id" name="aircraft-id" placeholder="Số hiệu máy bay" required><br>
+        <label for="aircraft-type-id">Mã loại máy bay:</label>
+        <input type="text" id="aircraft-type-id" name="aircraft-type-id" placeholder="Mã loại máy bay" required><br>
+        <label for="departure-date">Ngày đi:</label>
+        <input type="date" id="departure-date" name="departure-date" placeholder="Nhập ngày đi" required><br>
+        <button type="submit">Thêm lịch bay mới</button>
+    </form>
+
+    <!-- Table for displaying flight schedule information -->
+    <table>
+        <thead>
+            <tr>
+                <th>Ngày đi</th>
+                <th>Mã chuyến bay</th>
+                <th>Số hiệu máy bay</th>
+                <th>Mã loại máy bay</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for schedule_row in schedule_info %}
+            <tr>
+                <td>{{ schedule_row.NgayDi }}</td>
+                <td>{{ schedule_row.MaChuyenBay }}</td>
+                <td>{{ schedule_row.SoHieu }}</td>
+                <td>{{ schedule_row.MaLoai }}</td>
+                <td>
+                    <!-- Form để sửa thông tin lịch bay -->
+                    <form method="POST" action="{{ url_for('sua_lich') }}">
+                        <input type="hidden" name="schedule-id" value="{{ schedule_row.MaChuyenBay }}">
+                        <label for="edit-flight-id">Mã chuyến bay*:</label>
+                        <input type="text" id="edit-flight-id" name="flight-id" value="{{ schedule_row.SoHieu }}" required><br>
+                        <label for="edit-aircraft-id">Số hiệu máy bay:</label>
+                        <input type="text" id="edit-aircraft-id" name="aircraft-id" value="{{ schedule_row.MaLoai }}" required><br>
+                        <label for="edit-aircraft-type-id">Mã loại máy bay:</label>
+                        <input type="text" id="edit-aircraft-type-id" name="aircraft-type-id" value="{{ schedule_row.NgayDi }}" required><br>
+                        <label for="edit-departure-date">Ngày đi:</label>
+                        <input type="date" id="edit-departure-date" name="departure-date" value="{{ schedule_row.NgayDi }}" required><br>
+                        <button type="submit">Lưu thay đổi</button>
+                    </form>
+
+                    <!-- Form để xóa lịch bay -->
+                    <form method="POST" action="{{ url_for('xoa_lich') }}">
+                      <input type="hidden" name="flight-id" value="{{ schedule_row.MaChuyenBay }}"> <!-- Add this line -->
+                      <input type="hidden" name="schedule-id" value="{{ schedule_row.MaLichBay }}">
+                      <button type="submit" onclick="return confirm('Bạn có chắc chắn muốn xóa lịch bay này?');">Xóa</button>
+                  </form>
+                                       
+
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>      
