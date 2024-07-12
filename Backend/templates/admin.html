@@ -489,46 +489,71 @@
 
             <script>
             function updateEditFlightDetails(flightId) {
-                if (flightId) {
-                  fetch(`/get_flight_details?flight_id=${flightId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                      document.getElementById('edit-departure-datetime').value = data.departure_time;
-                      document.getElementById('edit-arrival-datetime').value = data.arrival_time;
-                    })
-                    .catch(error => console.error(error));
-                } else {
-                  document.getElementById('edit-departure-datetime').value = '';
-                  document.getElementById('edit-arrival-datetime').value = '';
-                }
+              if (flightId) {
+                fetch(`/get_flight_details?flight_id=${flightId}`)
+                  .then(response => response.json())
+                  .then(data => {
+                    document.getElementById('edit-departure-datetime').value = data.departure_time;
+                    document.getElementById('edit-arrival-datetime').value = data.arrival_time;
+                  })
+                  .catch(error => console.error(error));
+              } else {
+                document.getElementById('edit-departure-datetime').value = '';
+                document.getElementById('edit-arrival-datetime').value = '';
               }
+            }
 
-              function suaDatCho(event) {
+          function suaDatCho(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch('/sua_dat_cho', {
+              method: 'POST',
+              body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.error) {
+                alert(data.error);
+              } else if (data.success) {
+                alert(data.success);
+                location.reload();
+              }
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+              alert('Có lỗi xảy ra khi cập nhật đặt chỗ');
+            });
+          }
+
+          document.getElementById('suaDatChoForm').onsubmit = suaDatCho;
+
+          document.querySelectorAll('form[action="/xoa_dat_cho"]').forEach(form => {
+              form.onsubmit = function(event) {
                 event.preventDefault();
-                const form = event.target;
-                const formData = new FormData(form);
-
-                fetch('/sua_dat_cho', {
-                  method: 'POST',
-                  body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                  if (data.error) {
-                    alert(data.error);
-                  } else if (data.success) {
-                    alert(data.success);
-                    location.reload();
-                  }
-                })
-                .catch((error) => {
-                  console.error('Error:', error);
-                  alert('Có lỗi xảy ra khi cập nhật đặt chỗ');
-                });
-              }
-
-              document.getElementById('suaDatChoForm').onsubmit = suaDatCho;
-          </script>
+                if (confirm('Bạn có chắc chắn muốn xóa đặt chỗ này?')) {
+                  fetch(this.action, {
+                    method: 'POST',
+                    body: new FormData(this)
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.success) {
+                      alert(data.success);
+                      location.reload();
+                    } else if (data.error) {
+                      alert(data.error);
+                    }
+                  })
+                  .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi xóa đặt chỗ');
+                  });
+                }
+              };
+            });
+            </script>
           
             <!-- Bảng hiển thị thông tin đặt chỗ -->
             <table>
@@ -551,7 +576,10 @@
                   <td>{{ row.GioDi.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                   <td>{{ row.GioDen.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                   <td>
-                    <form method="POST" action="{{ url_for('xoa_dat_cho', customer_id=row.MaKH, departure_date=row.NgayDi, flight_id=row.MaChuyenBay) }}" onsubmit="return confirm('Bạn có chắc chắn muốn xóa đặt chỗ này?');">
+                    <form method="POST" action="{{ url_for('xoa_dat_cho') }}" onsubmit="return confirm('Bạn có chắc chắn muốn xóa đặt chỗ này?');">
+                      <input type="hidden" name="customer_id" value="{{ row.MaKH }}">
+                      <input type="hidden" name="flight_id" value="{{ row.MaChuyenBay }}">
+                      <input type="hidden" name="departure_date" value="{{ row.NgayDi.strftime('%Y-%m-%d') }}">
                       <button type="submit">Xóa</button>
                     </form>
                   </td>
@@ -975,75 +1003,190 @@
 
         <section id="assignment-info">
           <h2>Quản lý phân công</h2>
-          <form method="POST" action="{{ url_for('them_phan_cong') }}">
-              <label for="customer-id">Mã khách hàng:</label>
-              <select id="customer-id" required pattern="^KH.*$" name="customer-id" required>
-                  {% for customer in customer_info %}
-                      <option value="{{ customer.MaKH }}">{{ customer.MaKH }} - {{ customer.HoDem }} {{ customer.Ten }}</option>
-                  {% endfor %}
-              </select><br>
-              <label for="new-departure-date">Ngày đi:</label>
-              <input type="date" id="departure-date" name="departure-date" value="{{ assignment_info.NgayDi }}" required><br>
-              <label for="schedule-id">Mã lịch bay:</label>
-              <select id="schedule-id" name="schedule-id" required>
-                  {% for flight in flight_info %}
-                      <option value="{{ flight.MaChuyenBay }}">{{ flight.MaChuyenBay }} - {{ flight.TenSanBayDi }} - {{ flight.TenSanBayDen }}</option>
-                  {% endfor %}
-              </select><br>
-   
-              <button type="submit">Thêm phân công mới</button>
+          
+          <!-- Form thêm phân công -->
+          <form id="themPhanCongForm" method="POST" action="{{ url_for('them_phan_cong') }}">
+            <label for="employee-id">Mã nhân viên:</label>
+            <select id="employee-id" name="employee-id" required>
+              <option value="">-- Chọn Mã nhân viên --</option>
+              {% for employee in employee_info %}
+                <option value="{{ employee.MaNV }}">{{ employee.MaNV }} - {{ employee.HoDem }} {{ employee.Ten }}</option>
+              {% endfor %}
+            </select>
+
+            <label for="flight-id">Mã chuyến bay:</label>
+            <select id="flight-id" name="flight-id" required onchange="updateFlightDetailsForAssignment(this.value)">
+              <option value="">-- Chọn Mã chuyến bay --</option>
+              {% for flight in flight_info %}
+                <option value="{{ flight.MaChuyenBay }}">{{ flight.MaChuyenBay }} - {{ flight.TenSanBayDi }} - {{ flight.TenSanBayDen }}</option>
+              {% endfor %}
+            </select>
+
+            <label for="departure-datetime">Giờ đi:</label>
+            <input type="datetime-local" id="departure-datetime" name="departure-datetime" required readonly>
+
+            <label for="arrival-datetime">Giờ đến:</label>
+            <input type="datetime-local" id="arrival-datetime" name="arrival-datetime" required readonly>
+
+            <button type="submit">Thêm phân công</button>
           </form>
 
-          <form method="POST" action="{{ url_for('sua_phan_cong', customer_id=assignment_info.MaKH, departure_date=assignment_info.NgayDi, flight_id=assignment_info.MaChuyenBay) }}">
-            <label for="new-customer-id">Mã khách hàng:</label>
-            <select id="new-customer-id" required pattern="^KH.*$" name="new-customer-id" required>
-                {% for customer in customer_info %}
-                    <option value="{{ customer.MaKH }}" {% if customer.MaKH == assignment_info.MaKH %}selected{% endif %}>{{ customer.MaKH }} - {{ customer.HoDem }} {{ customer.Ten }}</option>
-                {% endfor %}
-            </select><br>
+          <!-- Form sửa phân công -->
+          <form id="suaPhanCongForm" method="POST" action="{{ url_for('sua_phan_cong') }}">
+            <label for="edit-employee-id">Mã nhân viên:</label>
+            <select id="edit-employee-id" name="employee-id" required>
+              <option value="">-- Chọn Mã nhân viên --</option>
+              {% for employee in employee_info %}
+                <option value="{{ employee.MaNV }}">{{ employee.MaNV }} - {{ employee.HoDem }} {{ employee.Ten }}</option>
+              {% endfor %}
+            </select>
 
-            <label for="new-departure-date">Ngày đi:</label>
-            <input type="date" id="new-departure-date" name="new-departure-date" value="{{ assignment_info.NgayDi }}" required><br>
+            <label for="edit-flight-id">Mã chuyến bay:</label>
+            <select id="edit-flight-id" name="flight-id" required onchange="updateEditFlightDetailsForAssignment(this.value)">
+              <option value="">-- Chọn Mã chuyến bay --</option>
+              {% for flight in flight_info %}
+                <option value="{{ flight.MaChuyenBay }}">{{ flight.MaChuyenBay }} - {{ flight.TenSanBayDi }} - {{ flight.TenSanBayDen }}</option>
+              {% endfor %}
+            </select>
 
-            <label for="new-flight-id">Mã chuyến bay:</label>
-            <select id="new-flight-id" name="new-flight-id" required>
-                {% for flight in flight_info %}
-                    <option value="{{ flight.MaChuyenBay }}" {% if flight.MaChuyenBay == assignment_info.MaChuyenBay %}selected{% endif %}>{{ flight.MaChuyenBay }} - {{ flight.TenSanBayDi }} - {{ flight.TenSanBayDen }}</option>
-                {% endfor %}
-            </select><br>
+            <label for="edit-departure-datetime">Giờ đi:</label>
+            <input type="datetime-local" id="edit-departure-datetime" name="departure-datetime" required readonly>
+
+            <label for="edit-arrival-datetime">Giờ đến:</label>
+            <input type="datetime-local" id="edit-arrival-datetime" name="arrival-datetime" required readonly>
 
             <button type="submit">Lưu thay đổi</button>
-        </form>
-   
+          </form>
+
+          <script>
+            function updateFlightDetailsForAssignment(flightId) {
+              if (flightId) {
+                fetch(`/get_flight_details_for_assignment?flight_id=${flightId}`)
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.error) {
+                      console.error(data.error);
+                      return;
+                    }
+                    document.getElementById('departure-datetime').value = data.departure_time;
+                    document.getElementById('arrival-datetime').value = data.arrival_time;
+                    // Thêm phần hiển thị thông tin sân bay
+                    const airportInfo = `${data.departure_airport} -> ${data.arrival_airport}`;
+                    document.getElementById('airport-info').textContent = airportInfo;
+                  })
+                  .catch(error => console.error('Error:', error));
+              } else {
+                document.getElementById('departure-datetime').value = '';
+                document.getElementById('arrival-datetime').value = '';
+                document.getElementById('airport-info').textContent = '';
+              }
+            }
+
+            function updateEditFlightDetailsForAssignment(flightId) {
+              if (flightId) {
+                fetch(`/get_flight_details_for_assignment?flight_id=${flightId}`)
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.error) {
+                      console.error(data.error);
+                      return;
+                    }
+                    document.getElementById('edit-departure-datetime').value = data.departure_time;
+                    document.getElementById('edit-arrival-datetime').value = data.arrival_time;
+                    // Thêm phần hiển thị thông tin sân bay nếu cần
+                    const airportInfo = `${data.departure_airport} -> ${data.arrival_airport}`;
+                    document.getElementById('edit-airport-info').textContent = airportInfo;
+                  })
+                  .catch(error => console.error('Error:', error));
+              } else {
+                document.getElementById('edit-departure-datetime').value = '';
+                document.getElementById('edit-arrival-datetime').value = '';
+                document.getElementById('edit-airport-info').textContent = '';
+              }
+            }
+  
+            document.getElementById('themPhanCongForm').onsubmit = function(event) {
+              event.preventDefault();
+              const formData = new FormData(this);
+              fetch('/them_phan_cong', {
+                method: 'POST',
+                body: formData
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  alert(data.success);
+                  location.reload();
+                } else if (data.error) {
+                  alert(data.error);
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi thêm phân công');
+              });
+            };
+  
+            document.getElementById('suaPhanCongForm').onsubmit = function(event) {
+              event.preventDefault();
+              const formData = new FormData(this);
+              fetch('/sua_phan_cong', {
+                method: 'POST',
+                body: formData
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  alert(data.success);
+                  location.reload();
+                } else if (data.error) {
+                  alert(data.error);
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi cập nhật phân công');
+              });
+            };
+          </script>
+
           <!-- Bảng hiển thị thông tin phân công -->
           <table>
-              <thead>
-                  <tr>
-                      <th>Mã khách hàng</th>
-                      <th>Ngày đi</th>
-                      <th>Mã chuyến bay</th>
-                      <th>Thao tác</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for row in booking_info %}
-                  <tr>
-                      <td>{{ row.MaKH }}</td>
-                      <td>{{ row.NgayDi }}</td>
-                      <td>{{ row.MaChuyenBay }}</td>
-                      <td>
-                          <form method="POST" action="{{ url_for('xoa_phan_cong', customer_id=row.MaKH, departure_date=row.NgayDi, flight_id=row.MaChuyenBay) }}">
-                              <input type="hidden" name="customer-id" value="{{ row.MaKH }}">
-                              <input type="hidden" name="departure-date" value="{{ row.NgayDi }}">
-                              <input type="hidden" name="flight-id" value="{{ row.MaChuyenBay }}">
-                              <button type="submit" onclick="return confirm('Bạn có chắc chắn muốn xóa phân công này?');">Xóa</button>
-                          </form>
-                      </td>
-                  </tr>
-                  {% endfor %}
-              </tbody>
+            <thead>
+              <tr>
+                <th>Mã nhân viên</th>
+                <th>Số điện thoại</th>
+                <th>Loại nhân viên</th>
+                <th>Mã chuyến bay</th>
+                <th>Sân bay đi - đến</th>
+                <th>Giờ đi</th>
+                <th>Giờ đến</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in assignment_info %}
+              <tr>
+                <td>{{ row['MaNV'] }}</td>
+                <td>{{ row['SDT'] }}</td>
+                <td>{{ row['LoaiNV'] }}</td>
+                <td>{{ row['MaChuyenBay'] }}</td>
+                <td>{{ row['TenSanBayDi'] }} -> {{ row['TenSanBayDen'] }}</td>
+                <td>{{ row['GioDi'].strftime('%Y-%m-%d %H:%M:%S') if row['GioDi'] else 'N/A' }}</td>
+                <td>{{ row['GioDen'].strftime('%Y-%m-%d %H:%M:%S') if row['GioDen'] else 'N/A' }}</td>
+                <td>
+                  <form method="POST" action="{{ url_for('xoa_phan_cong') }}" onsubmit="return confirm('Bạn có chắc chắn muốn xóa phân công này?');">
+                    <input type="hidden" name="employee_id" value="{{ row['MaNV'] }}">
+                    <input type="hidden" name="flight_id" value="{{ row['MaChuyenBay'] }}">
+                    <input type="hidden" name="departure_date" value="{{ row['GioDi'].strftime('%Y-%m-%d') if row['GioDi'] else '' }}">
+                    <button type="submit">Xóa</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
           </table>
-      </section>        
+        </section>        
 
     </main>
     <footer>
