@@ -409,10 +409,10 @@
             </select>
         
             <label for="departure-datetime">Giờ đi:</label>
-            <input type="datetime-local" id="departure-datetime" name="departure-datetime" required readonly>
+            <input type="datetime-local" id="booking-departure-datetime" name="departure-datetime" required readonly>
         
             <label for="arrival-datetime">Giờ đến:</label>
-            <input type="datetime-local" id="arrival-datetime" name="arrival-datetime" required readonly>
+            <input type="datetime-local" id="booking-arrival-datetime" name="arrival-datetime" required readonly>
         
             <button type="submit">Thêm thông tin đặt chỗ</button>
           </form>
@@ -423,13 +423,13 @@
                 fetch(`/get_flight_details?flight_id=${flightId}`)
                   .then(response => response.json())
                   .then(data => {
-                    document.getElementById('departure-datetime').value = data.departure_time;
-                    document.getElementById('arrival-datetime').value = data.arrival_time;
+                    document.getElementById('booking-departure-datetime').value = data.departure_time;
+                    document.getElementById('booking-arrival-datetime').value = data.arrival_time;
                   })
                   .catch(error => console.error(error));
               } else {
-                document.getElementById('departure-datetime').value = '';
-                document.getElementById('arrival-datetime').value = '';
+                document.getElementById('booking-departure-datetime').value = '';
+                document.getElementById('booking-arrival-datetime').value = '';
               }
             }
         
@@ -479,10 +479,10 @@
               </select>
           
               <label for="edit-departure-datetime">Giờ đi:</label>
-              <input type="datetime-local" id="edit-departure-datetime" name="departure-datetime" required readonly>
+              <input type="datetime-local" id="edit-booking-departure-datetime" name="departure-datetime" required readonly>
           
               <label for="edit-arrival-datetime">Giờ đến:</label>
-              <input type="datetime-local" id="edit-arrival-datetime" name="arrival-datetime" required readonly>
+              <input type="datetime-local" id="edit-booking-arrival-datetime" name="arrival-datetime" required readonly>
           
               <button type="submit">Lưu thay đổi</button>
             </form>
@@ -493,13 +493,13 @@
                 fetch(`/get_flight_details?flight_id=${flightId}`)
                   .then(response => response.json())
                   .then(data => {
-                    document.getElementById('edit-departure-datetime').value = data.departure_time;
-                    document.getElementById('edit-arrival-datetime').value = data.arrival_time;
+                    document.getElementById('edit-booking-departure-datetime').value = data.departure_time;
+                    document.getElementById('edit-booking-arrival-datetime').value = data.arrival_time;
                   })
                   .catch(error => console.error(error));
               } else {
-                document.getElementById('edit-departure-datetime').value = '';
-                document.getElementById('edit-arrival-datetime').value = '';
+                document.getElementById('edit-booking-departure-datetime').value = '';
+                document.getElementById('edit-booking-arrival-datetime').value = '';
               }
             }
 
@@ -1023,10 +1023,10 @@
             </select>
 
             <label for="departure-datetime">Giờ đi:</label>
-            <input type="datetime-local" id="departure-datetime" name="departure-datetime" required readonly>
+            <input type="datetime-local" id="assignment-departure-datetime" name="departure-datetime" required readonly>
 
             <label for="arrival-datetime">Giờ đến:</label>
-            <input type="datetime-local" id="arrival-datetime" name="arrival-datetime" required readonly>
+            <input type="datetime-local" id="assignment-arrival-datetime" name="arrival-datetime" required readonly>
 
             <button type="submit">Thêm phân công</button>
           </form>
@@ -1050,104 +1050,100 @@
             </select>
 
             <label for="edit-departure-datetime">Giờ đi:</label>
-            <input type="datetime-local" id="edit-departure-datetime" name="departure-datetime" required readonly>
+            <input type="datetime-local" id="edit-assignment-departure-datetime" name="departure-datetime" required readonly>
 
             <label for="edit-arrival-datetime">Giờ đến:</label>
-            <input type="datetime-local" id="edit-arrival-datetime" name="arrival-datetime" required readonly>
+            <input type="datetime-local" id="edit-assignment-arrival-datetime" name="arrival-datetime" required readonly>
 
             <button type="submit">Lưu thay đổi</button>
           </form>
 
           <script>
-            function updateFlightDetailsForAssignment(flightId) {
-              if (flightId) {
-                fetch(`/get_flight_details_for_assignment?flight_id=${flightId}`)
-                  .then(response => response.json())
-                  .then(data => {
-                    if (data.error) {
-                      console.error(data.error);
-                      return;
-                    }
-                    document.getElementById('departure-datetime').value = data.departure_time;
-                    document.getElementById('arrival-datetime').value = data.arrival_time;
-                    // Thêm phần hiển thị thông tin sân bay
-                    const airportInfo = `${data.departure_airport} -> ${data.arrival_airport}`;
-                    document.getElementById('airport-info').textContent = airportInfo;
-                  })
-                  .catch(error => console.error('Error:', error));
-              } else {
-                document.getElementById('departure-datetime').value = '';
-                document.getElementById('arrival-datetime').value = '';
-                document.getElementById('airport-info').textContent = '';
-              }
+          function updateFlightDetailsForAssignment(flightId) {
+            if (flightId) {
+              fetch(`/get_flight_details_for_assignment?flight_id=${flightId}`)
+                .then(response => response.json())
+                .then(data => {
+                  if (data.error) {
+                    console.error(data.error);
+                    return;
+                  }
+                  document.getElementById('assignment-departure-datetime').value = data.departure_time;
+                  document.getElementById('assignment-arrival-datetime').value = data.arrival_time;
+                  document.getElementById('assignment-airport-info').textContent = `${data.departure_airport} -> ${data.arrival_airport}`;
+                })
+                .catch(error => console.error('Error:', error));
+            } else {
+              document.getElementById('assignment-departure-datetime').value = '';
+              document.getElementById('assignment-arrival-datetime').value = '';
+              document.getElementById('assignment-airport-info').textContent = '';
             }
+          }
 
-            function updateEditFlightDetailsForAssignment(flightId) {
-              if (flightId) {
-                fetch(`/get_flight_details_for_assignment?flight_id=${flightId}`)
-                  .then(response => response.json())
-                  .then(data => {
-                    if (data.error) {
-                      console.error(data.error);
-                      return;
-                    }
-                    document.getElementById('edit-departure-datetime').value = data.departure_time;
-                    document.getElementById('edit-arrival-datetime').value = data.arrival_time;
-                    // Thêm phần hiển thị thông tin sân bay nếu cần
-                    const airportInfo = `${data.departure_airport} -> ${data.arrival_airport}`;
-                    document.getElementById('edit-airport-info').textContent = airportInfo;
-                  })
-                  .catch(error => console.error('Error:', error));
-              } else {
-                document.getElementById('edit-departure-datetime').value = '';
-                document.getElementById('edit-arrival-datetime').value = '';
-                document.getElementById('edit-airport-info').textContent = '';
-              }
+          function updateEditFlightDetailsForAssignment(flightId) {
+            if (flightId) {
+              fetch(`/get_flight_details_for_assignment?flight_id=${flightId}`)
+                .then(response => response.json())
+                .then(data => {
+                  if (data.error) {
+                    console.error(data.error);
+                    return;
+                  }
+                  document.getElementById('edit-assignment-departure-datetime').value = data.departure_time;
+                  document.getElementById('edit-assignment-arrival-datetime').value = data.arrival_time;
+                  document.getElementById('edit-assignment-airport-info').textContent = `${data.departure_airport} -> ${data.arrival_airport}`;
+                })
+                .catch(error => console.error('Error:', error));
+            } else {
+              document.getElementById('edit-assignment-departure-datetime').value = '';
+              document.getElementById('edit-assignment-arrival-datetime').value = '';
+              document.getElementById('edit-assignment-airport-info').textContent = '';
             }
-  
-            document.getElementById('themPhanCongForm').onsubmit = function(event) {
-              event.preventDefault();
-              const formData = new FormData(this);
-              fetch('/them_phan_cong', {
-                method: 'POST',
-                body: formData
-              })
-              .then(response => response.json())
-              .then(data => {
-                if (data.success) {
-                  alert(data.success);
-                  location.reload();
-                } else if (data.error) {
-                  alert(data.error);
-                }
-              })
-              .catch(error => {
-                console.error('Error:', error);
-                alert('Có lỗi xảy ra khi thêm phân công');
-              });
-            };
-  
-            document.getElementById('suaPhanCongForm').onsubmit = function(event) {
-              event.preventDefault();
-              const formData = new FormData(this);
-              fetch('/sua_phan_cong', {
-                method: 'POST',
-                body: formData
-              })
-              .then(response => response.json())
-              .then(data => {
-                if (data.success) {
-                  alert(data.success);
-                  location.reload();
-                } else if (data.error) {
-                  alert(data.error);
-                }
-              })
-              .catch(error => {
-                console.error('Error:', error);
-                alert('Có lỗi xảy ra khi cập nhật phân công');
-              });
-            };
+          }
+
+          document.getElementById('themPhanCongForm').onsubmit = function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('/them_phan_cong', {
+              method: 'POST',
+              body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                alert(data.success);
+                location.reload();
+              } else if (data.error) {
+                alert(data.error);
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('Có lỗi xảy ra khi thêm phân công');
+            });
+          };
+
+          document.getElementById('suaPhanCongForm').onsubmit = function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('/sua_phan_cong', {
+              method: 'POST',
+              body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                alert(data.success);
+                location.reload();
+              } else if (data.error) {
+                alert(data.error);
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('Có lỗi xảy ra khi cập nhật phân công');
+            });
+          };
           </script>
 
           <!-- Bảng hiển thị thông tin phân công -->
@@ -1155,6 +1151,7 @@
             <thead>
               <tr>
                 <th>Mã nhân viên</th>
+                <th>Tên nhân viên</th>
                 <th>Số điện thoại</th>
                 <th>Loại nhân viên</th>
                 <th>Mã chuyến bay</th>
@@ -1168,6 +1165,7 @@
               {% for row in assignment_info %}
               <tr>
                 <td>{{ row['MaNV'] }}</td>
+                <td>{{ row['Ten'] }}</td>
                 <td>{{ row['SDT'] }}</td>
                 <td>{{ row['LoaiNV'] }}</td>
                 <td>{{ row['MaChuyenBay'] }}</td>

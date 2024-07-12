@@ -4,9 +4,10 @@ chuyến bay tạo chuyến bay phải lớn hơn giờ hiện tại --> ok
 Lịch bay sửa form tạo lịch bay --> ok
 Đặt chỗ form thêm sửa bị lỗi chưa chạy --> ok
 form ngày đi lịch bay lỗi -> ok
-phân công sai csdl, thiếu nhân viên
-ngày đi của nhân viên để vậy thôi ok rồi
+phân công sai csdl, thiếu nhân viên --> ok
+ngày đi của nhân viên để vậy thôi ok rồi --> ok
 form sửa của tất cả bản ghi cho ng dùng đc chọn không cần nhập tay
 kiểm tra tất cả các ràng buộc reference
 chặn không cho truy cập api khi chưa đăng nhập
 máy bay update mã loại thành dropdown
+Dropdơn loại nhân viên: chỉ có 2 loại mà

@@ -231,6 +231,7 @@ def admin():
     """
     cursor.execute(query)
     assignment_info = cursor.fetchall()
+
     
     # Chuyển đổi kết quả thành list of dicts để dễ sử dụng trong template
     columns = [column[0] for column in cursor.description]
@@ -1007,12 +1008,12 @@ def sua_phan_cong():
 
 @app.route('/xoa_phan_cong', methods=['POST'])
 def xoa_phan_cong():
-    employee_id = request.form['employee_id']
-    flight_id = request.form['flight_id']
-    departure_date = request.form['departure_date']
+    data = request.json
+    employee_id = data['employee_id']
+    flight_id = data['flight_id']
+    departure_date = data['departure_date']
 
     try:
-        # Thực hiện xóa thông tin phân công từ cơ sở dữ liệu
         query = "DELETE FROM PhanCong WHERE MaNV = ? AND MaChuyenBay = ? AND NgayDi = ?"
         values = (employee_id, flight_id, departure_date)
         cursor.execute(query, values)
