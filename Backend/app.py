@@ -639,6 +639,7 @@ def them_dat_cho():
         cursor.execute(check_query, (customer_id, flight_id, ngay_di))
         if cursor.fetchone()[0] > 0:
             return jsonify({"error": "Đã tồn tại đặt chỗ cho khách hàng này trên chuyến bay này."}), 400
+        
 
         # Thêm bản ghi mới
         insert_query = "INSERT INTO DatCho (MaKH, NgayDi, MaChuyenBay) VALUES (?, ?, ?)"
@@ -650,6 +651,55 @@ def them_dat_cho():
     except Exception as e:
         cnxn.rollback()
         return jsonify({"error": f"Lỗi khi thêm đặt chỗ: {str(e)}"}), 500
+
+@app.route('/them_dat_cho_fe', methods=['POST'])
+def them_dat_cho_fe():
+    cursor = cnxn.cursor()
+    try:
+        # Xử lý dữ liệu đầu vào
+        if request.is_json:
+            data = request.json
+        else:
+            data = request.form
+
+        customer_id = data.get('customer-id')
+        flight_id = data.get('flight-id')
+        departure_datetime = data.get('departure-datetime')
+
+        # Kiểm tra dữ liệu đầu vào
+        if not all([customer_id, flight_id, departure_datetime]):
+            return jsonify({"error": "Thiếu thông tin đặt chỗ"}), 400
+
+        # Chuyển đổi chuỗi ngày tháng
+        departure_date = datetime.strptime(departure_datetime, '%Y-%m-%dT%H:%M')
+        ngay_di = departure_date.strftime('%Y-%m-%d')
+
+        # Kiểm tra đặt chỗ đã tồn tại
+        check_query = "SELECT COUNT(*) FROM DatCho WHERE MaKH = ? AND MaChuyenBay = ? AND NgayDi = ?"
+        cursor.execute(check_query, (customer_id, flight_id, ngay_di))
+        result = cursor.fetchone()
+        if result and result[0] > 0:
+            return jsonify({"error": "Đã tồn tại đặt chỗ cho khách hàng này trên chuyến bay này."}), 400
+
+        # Thêm bản ghi mới
+        insert_query = "INSERT INTO DatCho (MaKH, NgayDi, MaChuyenBay) VALUES (?, ?, ?)"
+        cursor.execute(insert_query, (customer_id, ngay_di, flight_id))
+        cnxn.commit()
+        
+        return jsonify({"success": "Thêm đặt chỗ thành công"}), 200
+
+    except pyodbc.Error as e:
+        cnxn.rollback()
+        error_message = str(e)
+        print(f"Database error: {error_message}")  # For server-side logging
+        return jsonify({"error": f"Lỗi database: {error_message}"}), 500
+    except Exception as e:
+        cnxn.rollback()
+        error_message = str(e)
+        print(f"Unexpected error: {error_message}")  # For server-side logging
+        return jsonify({"error": f"Lỗi không xác định: {error_message}"}), 500
+    finally:
+        cursor.close()
 
 @app.route('/get_flight_details', methods=['GET'])
 def get_flight_details():
