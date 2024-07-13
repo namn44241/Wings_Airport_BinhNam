@@ -560,6 +560,8 @@
               <thead>
                 <tr>
                   <th>Mã khách hàng</th>
+                  <th>Tên khách hàng</th>
+                  <th>Số điện thoại</th>
                   <th>Mã chuyến bay</th>
                   <th>Sân bay đi - đến</th>
                   <th>Giờ đi</th>
@@ -571,6 +573,8 @@
                 {% for row in booking_info %}
                 <tr>
                   <td>{{ row.MaKH }}</td>
+                  <td>{{ row.HoDem }} {{ row.Ten }}</td>
+                  <td>{{ row.SDT }}</td>
                   <td>{{ row.MaChuyenBay }}</td>
                   <td>{{ row.TenSanBayDi }} -> {{ row.TenSanBayDen }}</td>
                   <td>{{ row.GioDi.strftime('%Y-%m-%d %H:%M:%S') }}</td>
@@ -719,6 +723,13 @@
              
         <!-- Quản lý thông tin khách hàng -->
           <section id="customer-info">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
             <h2>Quản lý thông tin khách hàng</h2>
             <form method="POST" action="{{ url_for('them_kh') }}">
               <label for="customer-id">Mã khách hàng:</label>
@@ -766,14 +777,37 @@
                   <td>{{ row.Ten }}</td>
                   <td>{{ row.DiaChi }}</td>
                   <td>
-                    <form method="POST" action="{{ url_for('xoa_kh', customer_id=row.MaKH) }}" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khách hàng này?');">
-                      <button type="submit">Xóa</button>
-                    </form>
+                      <button onclick="deleteCustomer('{{ row.MaKH }}')">Xóa</button>
                   </td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
+            <script>
+            function deleteCustomer(customerId) {
+              if (confirm('Bạn có chắc chắn muốn xóa khách hàng này?')) {
+                fetch(`/xoa_kh/${customerId}`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.status === 'success') {
+                    alert(data.message);
+                    location.reload(); // Chỉ refresh khi xóa thành công
+                  } else {
+                    alert(data.message);
+                  }
+                })
+                .catch((error) => {
+                  console.error('Error:', error);
+                  alert('Có lỗi xảy ra khi xóa khách hàng.');
+                });
+              }
+            }
+            </script>
           </section>        
         
           <section id="employee-info">
@@ -852,14 +886,16 @@
             <form id="themLichForm" method="POST" action="{{ url_for('them_lich') }}">
                 <label for="flight-id">Mã chuyến bay:</label>
                 <select id="flight-id" name="flight-id" required>
-                <option class="customer-id" value="">-- Chọn Mã chuyến bay --</option>
+                    <option value="">-- Chọn Mã chuyến bay --</option>
                     {% for flight in flights %}
-                        <option value="{{ flight[0] }}">{{ flight[0] }}</option>
+                        <option value="{{ flight.MaChuyenBay }}">
+                            {{ flight.MaChuyenBay }} - {{ flight.TenSanBayDi }} - {{ flight.TenSanBayDen }}
+                        </option>
                     {% endfor %}
                 </select><br>
                 <label for="aircraft-id">Số hiệu máy bay:</label>
                 <select id="aircraft-id" name="aircraft-id" required>
-                <option class="customer-id" value="">-- Chọn Số hiệu máy bay--</option>
+                    <option value="">-- Chọn Số hiệu máy bay--</option>
                     {% for aircraft in aircrafts %}
                         <option value="{{ aircraft[0] }}">{{ aircraft[0] }}</option>
                     {% endfor %}
@@ -869,14 +905,16 @@
             <form method="POST" action="{{ url_for('sua_lich') }}">
                 <label for="edit-flight-id">Mã chuyến bay:</label>
                 <select id="edit-flight-id" name="flight-id" required>
-                <option class="customer-id" value="">-- Chọn Mã chuyến bay --</option>
+                    <option value="">-- Chọn Mã chuyến bay --</option>
                     {% for flight in flights %}
-                        <option value="{{ flight[0] }}">{{ flight[0] }}</option>
+                        <option value="{{ flight.MaChuyenBay }}">
+                            {{ flight.MaChuyenBay }} - {{ flight.TenSanBayDi }} - {{ flight.TenSanBayDen }}
+                        </option>
                     {% endfor %}
                 </select><br>
                 <label for="edit-aircraft-id">Số hiệu máy bay:</label>
                 <select id="edit-aircraft-id" name="aircraft-id" required>
-                <option class="customer-id" value="">-- Chọn Số hiệu máy bay--</option>
+                    <option value="">-- Chọn Số hiệu máy bay--</option>
                     {% for aircraft in aircrafts %}
                         <option value="{{ aircraft[0] }}">{{ aircraft[0] }}</option>
                     {% endfor %}
@@ -1144,44 +1182,66 @@
               alert('Có lỗi xảy ra khi cập nhật phân công');
             });
           };
+
+          function deleteAssignment(employeeId, flightId, departureDate) {
+            if (confirm('Bạn có chắc chắn muốn xóa phân công này?')) {
+                fetch('/xoa_phan_cong', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `employee_id=${employeeId}&flight_id=${flightId}&departure_date=${departureDate}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.success);
+                        location.reload();
+                    } else if (data.error) {
+                        alert(data.error);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi xóa phân công');
+                });
+            }
+        }
           </script>
 
           <!-- Bảng hiển thị thông tin phân công -->
           <table>
             <thead>
-              <tr>
-                <th>Mã nhân viên</th>
-                <th>Tên nhân viên</th>
-                <th>Số điện thoại</th>
-                <th>Loại nhân viên</th>
-                <th>Mã chuyến bay</th>
-                <th>Sân bay đi - đến</th>
-                <th>Giờ đi</th>
-                <th>Giờ đến</th>
-                <th>Thao tác</th>
-              </tr>
+                <tr>
+                    <th>Mã nhân viên</th>
+                    <th>Tên nhân viên</th>
+                    <th>Số điện thoại</th>
+                    <th>Loại nhân viên</th>
+                    <th>Mã chuyến bay</th>
+                    <th>Sân bay đi</th>
+                    <th>Sân bay đến</th>
+                    <th>Giờ đi</th>
+                    <th>Giờ đến</th>
+                    <th>Thao tác</th>
+                </tr>
             </thead>
             <tbody>
-              {% for row in assignment_info %}
-              <tr>
-                <td>{{ row['MaNV'] }}</td>
-                <td>{{ row['Ten'] }}</td>
-                <td>{{ row['SDT'] }}</td>
-                <td>{{ row['LoaiNV'] }}</td>
-                <td>{{ row['MaChuyenBay'] }}</td>
-                <td>{{ row['TenSanBayDi'] }} -> {{ row['TenSanBayDen'] }}</td>
-                <td>{{ row['GioDi'].strftime('%Y-%m-%d %H:%M:%S') if row['GioDi'] else 'N/A' }}</td>
-                <td>{{ row['GioDen'].strftime('%Y-%m-%d %H:%M:%S') if row['GioDen'] else 'N/A' }}</td>
-                <td>
-                  <form method="POST" action="{{ url_for('xoa_phan_cong') }}" onsubmit="return confirm('Bạn có chắc chắn muốn xóa phân công này?');">
-                    <input type="hidden" name="employee_id" value="{{ row['MaNV'] }}">
-                    <input type="hidden" name="flight_id" value="{{ row['MaChuyenBay'] }}">
-                    <input type="hidden" name="departure_date" value="{{ row['GioDi'].strftime('%Y-%m-%d') if row['GioDi'] else '' }}">
-                    <button type="submit">Xóa</button>
-                  </form>
-                </td>
-              </tr>
-              {% endfor %}
+                {% for assignment in assignment_info %}
+                <tr>
+                    <td>{{ assignment.MaNV }}</td>
+                    <td>{{ assignment.HoTen }}</td>
+                    <td>{{ assignment.SDT }}</td>
+                    <td>{{ assignment.LoaiNV }}</td>
+                    <td>{{ assignment.MaChuyenBay }}</td>
+                    <td>{{ assignment.TenSanBayDi }}</td>
+                    <td>{{ assignment.TenSanBayDen }}</td>
+                    <td>{{ assignment.GioDi }}</td>
+                    <td>{{ assignment.GioDen }}</td>
+                    <td>
+                        <button onclick="deleteAssignment('{{ assignment.MaNV }}', '{{ assignment.MaChuyenBay }}', '{{ assignment.NgayDi }}')">Xóa</button>
+                    </td>
+                </tr>
+                {% endfor %}
             </tbody>
           </table>
         </section>        

@@ -168,9 +168,11 @@ def admin():
 
     # Lấy danh sách thông tin đặt chỗ và thông tin chuyến bay
     query = """
-    SELECT dc.MaKH, dc.NgayDi, cb.MaChuyenBay, cb.GioDi, cb.GioDen, cb.TenSanBayDi, cb.TenSanBayDen
+    SELECT dc.MaKH, kh.HoDem, kh.Ten, kh.SDT, dc.NgayDi, cb.MaChuyenBay, 
+        cb.GioDi, cb.GioDen, cb.TenSanBayDi, cb.TenSanBayDen
     FROM DatCho dc
     JOIN ChuyenBay cb ON dc.MaChuyenBay = cb.MaChuyenBay
+    JOIN KhachHang kh ON dc.MaKH = kh.MaKH
     """
     cursor.execute(query)
     booking_info = cursor.fetchall()
@@ -224,7 +226,7 @@ def admin():
     assignment_info = [row for row in cursor.fetchall()]
 
     query = """
-    SELECT p.MaNV, n.SDT, n.LoaiNV, p.MaChuyenBay, c.TenSanBayDi, c.TenSanBayDen, c.GioDi, c.GioDen
+    SELECT p.MaNV, n.HoDem + ' ' + n.Ten AS HoTen, n.SDT, n.LoaiNV, p.MaChuyenBay, c.TenSanBayDi, c.TenSanBayDen, c.GioDi, c.GioDen, p.NgayDi
     FROM PhanCong p
     JOIN NhanVien n ON p.MaNV = n.MaNV
     JOIN ChuyenBay c ON p.MaChuyenBay = c.MaChuyenBay
@@ -232,7 +234,6 @@ def admin():
     cursor.execute(query)
     assignment_info = cursor.fetchall()
 
-    
     # Chuyển đổi kết quả thành list of dicts để dễ sử dụng trong template
     columns = [column[0] for column in cursor.description]
     assignment_info = [dict(zip(columns, row)) for row in assignment_info]
@@ -282,20 +283,27 @@ def admin():
     }
 
     # Thêm code để lấy dữ liệu cho quản lý lịch bay
-    flights_query = "SELECT MaChuyenBay FROM ChuyenBay"
+    flights_query = """
+    SELECT CB.MaChuyenBay, CB.TenSanBayDi, CB.TenSanBayDen 
+    FROM ChuyenBay CB
+    """
     aircrafts_query = "SELECT SoHieu FROM MayBay"
+
     flights = cursor.execute(flights_query).fetchall()
     aircrafts = cursor.execute(aircrafts_query).fetchall()
 
     schedules_query = """
-    SELECT LB.MaChuyenBay, LB.SoHieu, MB.MaLoai, LMB.HangSanXuat, MB.SoGheNgoi, 
-           CB.TenSanBayDi, CB.TenSanBayDen, CB.GioDi, CB.GioDen
+    SELECT LB.MaChuyenBay, LB.SoHieu, MB.MaLoai, LMB.HangSanXuat, MB.SoGheNgoi,
+            CB.TenSanBayDi, CB.TenSanBayDen, CB.GioDi, CB.GioDen
     FROM LichBay LB
     JOIN MayBay MB ON LB.SoHieu = MB.SoHieu
     JOIN LoaiMayBay LMB ON MB.MaLoai = LMB.MaLoai
     JOIN ChuyenBay CB ON LB.MaChuyenBay = CB.MaChuyenBay
     """
     schedules = cursor.execute(schedules_query).fetchall()
+
+    # Chuyển kết quả thành danh sách các từ điển
+    flights = [{"MaChuyenBay": f[0], "TenSanBayDi": f[1], "TenSanBayDen": f[2]} for f in flights]
 
     return render_template('admin.html',
                            username=username,
@@ -785,10 +793,25 @@ def sua_kh():
 
 @app.route('/xoa_kh/<customer_id>', methods=['POST'])
 def xoa_kh(customer_id):
-    query = "DELETE FROM KhachHang WHERE MaKH = ?"
-    cursor.execute(query, (customer_id,))
-    cnxn.commit()
-    return redirect(url_for('admin'))
+    try:
+        # Kiểm tra xem khách hàng có trong bảng DatCho không
+        check_query = "SELECT COUNT(*) FROM DatCho WHERE MaKH = ?"
+        cursor.execute(check_query, (customer_id,))
+        count = cursor.fetchone()[0]
+        
+        if count > 0:
+            # Nếu có, không xóa và trả về thông báo lỗi
+            return jsonify({"status": "error", "message": "Không thể xóa khách hàng này vì khách hàng này đã đặt chỗ!"})
+        else:
+            # Nếu không, tiến hành xóa
+            delete_query = "DELETE FROM KhachHang WHERE MaKH = ?"
+            cursor.execute(delete_query, (customer_id,))
+            cnxn.commit()
+            return jsonify({"status": "success", "message": "Đã xóa khách hàng thành công."})
+    
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"status": "error", "message": f"Có lỗi xảy ra: {str(e)}"})
 
 ### Các hàm xử lý cho quản lý NHÂN VIÊN
 
@@ -1008,10 +1031,9 @@ def sua_phan_cong():
 
 @app.route('/xoa_phan_cong', methods=['POST'])
 def xoa_phan_cong():
-    data = request.json
-    employee_id = data['employee_id']
-    flight_id = data['flight_id']
-    departure_date = data['departure_date']
+    employee_id = request.form['employee_id']
+    flight_id = request.form['flight_id']
+    departure_date = request.form['departure_date']
 
     try:
         query = "DELETE FROM PhanCong WHERE MaNV = ? AND MaChuyenBay = ? AND NgayDi = ?"

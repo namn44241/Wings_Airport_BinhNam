@@ -6,8 +6,7 @@ Lịch bay sửa form tạo lịch bay --> ok
 form ngày đi lịch bay lỗi -> ok
 phân công sai csdl, thiếu nhân viên --> ok
 ngày đi của nhân viên để vậy thôi ok rồi --> ok
-form sửa của tất cả bản ghi cho ng dùng đc chọn không cần nhập tay
-kiểm tra tất cả các ràng buộc reference
+form sửa của tất cả bản ghi cho ng dùng đc chọn không cần nhập tay -- (còn loại NV, mã loại máy bay)
+kiểm tra tất cả các ràng buộc reference (thông báo không xóa khách khi đã đặt chỗ, không xóa nhân viên khi đã phân công, không xóa máy bay khi đã tạo lịch bay hoặc chuyêns bay (ok))
 chặn không cho truy cập api khi chưa đăng nhập
-máy bay update mã loại thành dropdown
-Dropdơn loại nhân viên: chỉ có 2 loại mà
+gửi mail khách khi đặt chỗ thành công
