@@ -144,10 +144,7 @@
                 <div class="chart-item">
                     <canvas id="loaiMayBayChart"></canvas>
                 </div>
-                <div class="chart-item">
-                  <canvas id="nhanVienTheoLoaiChart"></canvas>
-                </div>
-    
+
             <script>
               $(document).ready(function() {
                   var stats = {{ stats | tojson | safe }};
@@ -187,34 +184,19 @@
                       });
                   }
           
-                  // Biểu đồ phân bổ nhân viên theo loại
-                  if (stats.nhan_vien_theo_loai) {
-                      new Chart(document.getElementById('nhanVienTheoLoaiChart').getContext('2d'), {
-                          type: 'doughnut',
-                          data: {
-                              labels: stats.nhan_vien_theo_loai.labels,
-                              datasets: [{
-                                  data: stats.nhan_vien_theo_loai.data,
-                                  backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0']
-                              }]
-                          },
-                          options: { title: { display: true, text: 'Phân Bổ Nhân Viên Theo Loại' } }
-                      });
-                  }
-          
                   // Kiểm tra nếu có lỗi khi lấy dữ liệu
                   if (!stats.loai_may_bay_stats || !stats.top_chuyen_bay || !stats.nhan_vien_theo_loai) {
                       console.error("Không thể lấy dữ liệu thống kê. Vui lòng kiểm tra lại server.");
                   }
               });
           </script>
-
         </section>
+
         <section id="flight-info">
             <h2>Quản lý thông tin chuyến bay</h2>
           
             <!-- Form để thêm chuyến bay mới -->
-            <form id="add-flight-form" method="POST" action="{{ url_for('them_cb') }}">
+            <form id="add-flight-form" method="POST" action="{{ url_for('them_cb') }}" onsubmit="return validateForm()">
               <label for="flight-id">Mã chuyến bay:</label>
                 <input type="text" required pattern="^CB.*$" id="flight-id" name="flight-id" value="{{ next_flight_id }}" readonly><br>
               <label for="departure-airport">Sân bay đi:</label>
@@ -227,23 +209,18 @@
               <input type="datetime-local" id="arrival-time" name="arrival-time" required><br>
               <button type="submit">Thêm chuyến bay mới</button>
             </form>
-          
-            <!-- Form để sửa chuyến bay -->
-            <form id="edit-flight-form" method="POST" action="{{ url_for('sua_cb') }}">
-              <label for="edit-flight-id">Mã chuyến bay*:</label>
-              <input type="text" id="edit-flight-id" name="flight-id" placeholder="Nhập Mã chuyến bay muốn sửa" required><br>
-              <label for="edit-departure-airport">Sân bay đi:</label>
-              <input type="text" id="edit-departure-airport" name="departure-airport" placeholder="Nhập Sân bay đi"><br>
-              <label for="edit-arrival-airport">Sân bay đến:</label>
-              <input type="text" id="edit-arrival-airport" name="arrival-airport" placeholder="Nhập Sân bay đến"><br>
-              <label for="edit-departure-time">Giờ đi:</label>
-              <input type="datetime-local" id="edit-departure-time" name="departure-time" required><br>
-              <label for="edit-arrival-time">Giờ đến:</label>
-              <input type="datetime-local" id="edit-arrival-time" name="arrival-time" required><br>
-              <button type="submit">Lưu thay đổi</button>
-            </form>
 
             <script>
+              function validateForm() {
+                  var departureAirport = document.getElementById("departure-airport").value;
+                  var arrivalAirport = document.getElementById("arrival-airport").value;
+                  
+                  if (departureAirport === arrivalAirport) {
+                      alert("Sân bay đi và đến phải khác nhau");
+                      return false;
+                  }
+                  return true;
+              }
               function validateFlightTimes(formId) {
                 const form = document.getElementById(formId);
                 const departureTime = new Date(form.querySelector('[name="departure-time"]').value);
@@ -288,7 +265,7 @@
                     e.preventDefault();
                 }
             };
-              </script>
+            </script>
           
             <!-- Bảng hiển thị thông tin chuyến bay -->
             <table>
@@ -311,34 +288,102 @@
                   <td>{{ row.GioDi.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                   <td>{{ row.GioDen.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                   <td>
-                    <form method="POST" action="{{ url_for('xoa_cb', flight_id=row.MaChuyenBay) }}" onsubmit="return confirm('Bạn có chắc chắn muốn xóa chuyến bay này?');">
-                      <button type="submit">Xóa</button>
+                    <button onclick="showEditForm('{{ row.MaChuyenBay }}')">Sửa</button>
+                    <button onclick="deleteFlightConfirm('{{ row.MaChuyenBay }}')">Xóa</button>
+                    <form id="edit-form-{{ row.MaChuyenBay }}" style="display: none;" onsubmit="return editFlight('{{ row.MaChuyenBay }}')">
+                      <input type="hidden" name="flight-id" value="{{ row.MaChuyenBay }}">
+                      <label for="edit-departure-airport-{{ row.MaChuyenBay }}">Sân bay đi:</label>
+                      <input type="text" id="edit-departure-airport-{{ row.MaChuyenBay }}" name="departure-airport" value="{{ row.TenSanBayDi }}" required><br>
+                      <label for="edit-arrival-airport-{{ row.MaChuyenBay }}">Sân bay đến:</label>
+                      <input type="text" id="edit-arrival-airport-{{ row.MaChuyenBay }}" name="arrival-airport" value="{{ row.TenSanBayDen }}" required><br>
+                      <label for="edit-departure-time-{{ row.MaChuyenBay }}">Giờ đi:</label>
+                      <input type="datetime-local" id="edit-departure-time-{{ row.MaChuyenBay }}" name="departure-time" value="{{ row.GioDi.strftime('%Y-%m-%dT%H:%M') }}" required><br>
+                      <label for="edit-arrival-time-{{ row.MaChuyenBay }}">Giờ đến:</label>
+                      <input type="datetime-local" id="edit-arrival-time-{{ row.MaChuyenBay }}" name="arrival-time" value="{{ row.GioDen.strftime('%Y-%m-%dT%H:%M') }}" required><br>
+                      <button type="submit">Lưu thay đổi</button>
                     </form>
                   </td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
+            <script>
+            function validateForm() {
+                var departureAirport = document.getElementById("departure-airport").value;
+                var arrivalAirport = document.getElementById("arrival-airport").value;
+                
+                if (departureAirport === arrivalAirport) {
+                    alert("Sân bay đi và đến phải khác nhau");
+                    return false;
+                }
+                return true;
+            }
+            function showEditForm(flightId) {
+              const form = document.getElementById(`edit-form-${flightId}`);
+              form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            }
+
+            function editFlight(flightId) {
+              const form = document.getElementById(`edit-form-${flightId}`);
+              const formData = new FormData(form);
+
+              if (!validateFlightTimes(`edit-form-${flightId}`)) {
+                return false;
+              }
+
+              fetch('/sua_cb', {
+                method: 'POST',
+                body: formData
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.status === 'success') {
+                  alert(data.message);
+                  location.reload();
+                } else {
+                  alert(data.message);
+                }
+              })
+              .catch((error) => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi sửa thông tin chuyến bay.');
+              });
+
+              return false;
+            }
+
+            function deleteFlightConfirm(flightId) {
+              if (confirm('Bạn có chắc chắn muốn xóa chuyến bay này?')) {
+                fetch(`/xoa_cb/${flightId}`, {
+                  method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.status === 'success') {
+                    alert(data.message);
+                    location.reload();
+                  } else {
+                    alert(data.message);
+                  }
+                })
+                .catch((error) => {
+                  console.error('Error:', error);
+                  alert('Có lỗi xảy ra khi xóa chuyến bay.');
+                });
+              }
+            } 
+            </script>
           </section>
         
           <section id="airport-info">
             <h2>Quản lý thông tin loại máy bay</h2>
             <!-- Form để thêm loại máy bay mới -->
-            <form method="POST" action="{{ url_for('them_loai_mb') }}">
+            <form id="add-plane-type-form">
                 <label for="plane-type-id">Mã loại:</label>
                 <input type="text" id="plane-type-id" name="plane-type-id" value="{{ next_plane_type_id }}" readonly><br>
                 <label for="manufacturer">Hãng sản xuất:</label>
                 <input type="text" id="manufacturer" name="manufacturer" placeholder="Nhập tên hãng sản xuất" required><br>
-                <button type="submit">Thêm thông tin Loại máy bay</button>
-            </form>
-        
-            <!-- Form để sửa thông tin loại máy bay -->
-            <form method="POST" action="{{ url_for('sua_loai_mb') }}">
-                <label for="edit-plane-type-id">Mã loại*:</label>
-                <input type="text" id="edit-plane-type-id" name="plane-type-id" placeholder="Nhập mã loại cần sửa!" required><br>
-                <label for="edit-manufacturer">Hãng sản xuất:</label>
-                <input type="text" id="edit-manufacturer" name="manufacturer" placeholder="Nhập tên hãng sản xuất" required><br>
-                <button type="submit">Lưu thay đổi</button>
+                <button type="button" onclick="addPlaneType()">Thêm thông tin Loại máy bay</button>
             </form>
         
             <!-- Bảng hiển thị thông tin loại máy bay -->
@@ -356,36 +401,96 @@
                         <td>{{ row['MaLoai'] }}</td>
                         <td>{{ row['HangSanXuat'] }}</td>
                         <td>
-                            <form method="POST" action="{{ url_for('xoa_loai_mb', plane_type_id=row['MaLoai']) }}" onsubmit="return confirm('Bạn có chắc chắn muốn xóa loại máy bay này?');">
-                                <button type="submit">Xóa</button>
+                            <button onclick="showEditForm('{{ row['MaLoai'] }}')">Sửa</button>
+                            <button onclick="deletePlaneType('{{ row['MaLoai'] }}')">Xóa</button>
+                            <form id="edit-form-{{ row['MaLoai'] }}" style="display: none;" onsubmit="return editPlaneType('{{ row['MaLoai'] }}')">
+                                <input type="hidden" name="plane-type-id" value="{{ row['MaLoai'] }}">
+                                <label for="edit-manufacturer-{{ row['MaLoai'] }}">Hãng sản xuất:</label>
+                                <input type="text" id="edit-manufacturer-{{ row['MaLoai'] }}" name="manufacturer" value="{{ row['HangSanXuat'] }}" required><br>
+                                <button type="submit">Lưu thay đổi</button>
                             </form>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        </section>        
+        </section>
         
-          <script>
-                var flightSelect = document.getElementById('flight-id');
-                var departureDate = document.getElementById('departure-date');
-                var customerSelect = document.getElementById('customer-id');
-            
-                flightSelect.addEventListener('change', function() {
-                    var selectedFlightId = this.value;
-                    var selectedCustomerId = customerSelect.value;
-            
-                    // Gửi yêu cầu AJAX để lấy ngày đi tương ứng với mã chuyến bay và mã khách hàng
-                    fetch('/get_departure_date/' + selectedCustomerId + '/' + selectedFlightId)
-                        .then(response => response.json())
-                        .then(data => {
-                            departureDate.value = data.departure_date;
-                        })
-                        .catch(error => {
-                            console.error('Lỗi khi lấy ngày đi:', error);
-                        });
+        <script>
+        function showEditForm(planeTypeId) {
+            const form = document.getElementById(`edit-form-${planeTypeId}`);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function addPlaneType() {
+            const form = document.getElementById('add-plane-type-form');
+            const formData = new FormData(form);
+        
+            fetch('/them_loai_mb', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi thêm loại máy bay.');
+            });
+        }
+        
+        function editPlaneType(planeTypeId) {
+            const form = document.getElementById(`edit-form-${planeTypeId}`);
+            const formData = new FormData(form);
+        
+            fetch(`/sua_loai_mb/${planeTypeId}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi sửa thông tin loại máy bay.');
+            });
+        
+            return false;
+        }
+        
+        function deletePlaneType(planeTypeId) {
+            if (confirm('Bạn có chắc chắn muốn xóa loại máy bay này?')) {
+                fetch(`/xoa_loai_mb/${planeTypeId}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi xóa loại máy bay.');
                 });
-            </script>
+            }
+        }
+        </script>
 
         <section id="airline-info">
           <h2>Quản lý thông tin đặt chỗ</h2>
@@ -593,133 +698,144 @@
             </table>
           </section>
         
-        
           <section id="aircraft-info">
             <h2>Quản lý thông tin máy bay</h2>
-
+        
             <form id="add-plane-form">
                 <label for="plane-id">Số hiệu:</label>
                 <input type="text" id="plane-id" name="plane-id" placeholder="Nhập số hiệu" required><br>
                 <label for="plane-type-id">Mã loại:</label>
-                <input type="text" id="plane-type-id" name="plane-type-id" placeholder="Nhập mã loại" required><br>
+                <select id="plane-type-id" name="plane-type-id" required>
+                    <option value="">Chọn mã loại</option>
+                    {% for type in plane_types %}
+                    <option value="{{ type.MaLoai }}">{{ type.MaLoai }} - {{ type.HangSanXuat }}</option>
+                    {% endfor %}
+                </select><br>
                 <label for="seat-quantity">Số lượng ghế:</label>
                 <input type="number" id="seat-quantity" name="seat-quantity" placeholder="Nhập số lượng ghế" required><br>
                 <button type="submit">Thêm máy bay mới</button>
             </form>
-            <script>
-            document.getElementById('add-plane-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                let planeId = document.getElementById('plane-id').value;
-                if (planeId.length > 10) {
-                    alert('Số hiệu máy bay không được vượt quá 10 ký tự');
-                    return;
-                }
-                
-                let formData = new FormData(this);
-            
-                fetch('/them_mb', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        location.reload(); 
-                    } else {
-                        alert('Lỗi: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Đã xảy ra lỗi khi thêm máy bay');
-                });
-            });
-            </script>
-        
-            <!-- Form để sửa thông tin máy bay -->
-            <form id="edit-plane-form" method="POST" action="{{ url_for('sua_mb') }}">
-              <label for="edit-plane-id">Số hiệu*:</label>
-              <input type="text" id="edit-plane-id" name="plane-id" placeholder="Nhập số hiệu muốn sửa" required><br>
-              <label for="edit-plane-type-id">Mã loại:</label>
-              <input type="text" id="edit-plane-type-id" name="plane-type-id" placeholder="Nhập mã loại" required><br>
-              <label for="edit-seat-quantity">Số lượng ghế:</label>
-              <input type="text" id="edit-seat-quantity" name="seat-quantity" placeholder="Nhập số lượng ghế" required><br>
-              <button type="submit">Lưu thay đổi</button>
-          </form>
-          
-          <script>
-          document.getElementById('edit-plane-form').addEventListener('submit', function(e) {
-              e.preventDefault();
-              
-              let formData = new FormData(this);
-          
-              fetch('{{ url_for("sua_mb") }}', {
-                  method: 'POST',
-                  body: formData
-              })
-              .then(response => response.json())
-              .then(data => {
-                  if (data.success) {
-                      alert(data.message);
-                      location.reload();  // Tải lại trang nếu thành công
-                  } else {
-                      alert(data.message);
-                  }
-              })
-              .catch(error => {
-                  console.error('Error:', error);
-                  alert('Đã xảy ra lỗi khi sửa thông tin máy bay');
-              });
-          });
-          </script>
         
             <!-- Bảng hiển thị thông tin máy bay -->
             <table>
-              <thead>
-                <tr>
-                  <th>Số hiệu</th>
-                  <th>Mã loại</th>
-                  <th>Số lượng ghế</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for plane in plane_info %}
-                <tr>
-                  <td>{{ plane.SoHieu }}</td>
-                  <td>{{ plane.MaLoai }}</td>
-                  <td>{{ plane.SoGheNgoi }}</td>
-                  <td>
-                    <button class="button1" type="submit" onclick="deletePlane('{{ plane.SoHieu }}')">Xóa</button>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
+                <thead>
+                    <tr>
+                        <th>Số hiệu</th>
+                        <th>Mã loại</th>
+                        <th>Số lượng ghế</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for plane in plane_info %}
+                    <tr>
+                        <td>{{ plane.SoHieu }}</td>
+                        <td>{{ plane.MaLoai }} - {{ plane.HangSanXuat }}</td>
+                        <td>{{ plane.SoGheNgoi }}</td>
+                        <td>
+                            <button onclick="showEditForm('{{ plane.SoHieu }}')">Sửa</button>
+                            <button onclick="deletePlane('{{ plane.SoHieu }}')">Xóa</button>
+                            <form id="edit-form-{{ plane.SoHieu }}" style="display: none;" onsubmit="return editPlane('{{ plane.SoHieu }}')">
+                                <input type="hidden" name="plane-id" value="{{ plane.SoHieu }}">
+                                <label for="edit-plane-type-id-{{ plane.SoHieu }}">Mã loại:</label>
+                                <select id="edit-plane-type-id-{{ plane.SoHieu }}" name="plane-type-id" required>
+                                    {% for type in plane_types %}
+                                    <option value="{{ type.MaLoai }}" {% if type.MaLoai == plane.MaLoai %}selected{% endif %}>
+                                        {{ type.MaLoai }} - {{ type.HangSanXuat }}
+                                    </option>
+                                    {% endfor %}
+                                </select><br>
+                                <label for="edit-seat-quantity-{{ plane.SoHieu }}">Số lượng ghế:</label>
+                                <input type="number" id="edit-seat-quantity-{{ plane.SoHieu }}" name="seat-quantity" value="{{ plane.SoGheNgoi }}" required><br>
+                                <button type="submit">Lưu thay đổi</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>            
         </section>
+        
         <script>
-          function deletePlane(planeId) {
-              if (confirm('Bạn có chắc muốn xóa máy bay này?')) {
-                  fetch(`/xoa_mb/${planeId}`, {
-                      method: 'POST',
-                  })
-                  .then(response => response.json())
-                  .then(data => {
-                      alert(data.message);
-                      if (data.success) {
-                          // Nếu xóa thành công, reload trang
-                          location.reload();
-                      }
-                  })
-                  .catch((error) => {
-                      console.error('Error:', error);
-                      alert('Đã xảy ra lỗi khi xóa máy bay');
-                  });
-              }
-          }
-          </script>                
+        document.getElementById('add-plane-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+        
+            let planeId = document.getElementById('plane-id').value;
+            if (planeId.length > 10) {
+                alert('Số hiệu máy bay không được vượt quá 10 ký tự');
+                return;
+            }
+            
+            let formData = new FormData(this);
+        
+            fetch('/them_mb', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload(); 
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Đã xảy ra lỗi khi thêm máy bay');
+            });
+        });
+        
+        function showEditForm(planeId) {
+            const form = document.getElementById(`edit-form-${planeId}`);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function editPlane(planeId) {
+            const form = document.getElementById(`edit-form-${planeId}`);
+            const formData = new FormData(form);
+        
+            fetch('/sua_mb', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Đã xảy ra lỗi khi sửa thông tin máy bay');
+            });
+        
+            return false;
+        }
+        
+        function deletePlane(planeId) {
+            if (confirm('Bạn có chắc muốn xóa máy bay này?')) {
+                fetch(`/xoa_mb/${planeId}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.success) {
+                        location.reload();
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi khi xóa máy bay');
+                });
+            }
+        }
+        </script>             
              
         <!-- Quản lý thông tin khách hàng -->
           <section id="customer-info">
@@ -744,46 +860,75 @@
               <input type="text" id="customer-address" name="customer-address" placeholder="Nhập địa chỉ"><br>
               <button type="submit">Thêm thông tin khách hàng</button>
             </form>
-            <form method="POST" action="{{ url_for('sua_kh') }}">
-                <label for="edit-customer-id">Mã khách hàng*:</label>
-                <input type="text" required pattern="^KH.*$" id="edit-customer-id" name="customer-id" placeholder="Nhập mã khách hàng cần sửa!" required><br>
-                <label for="edit-customer-phone">Số điện thoại:</label>
-                <input type="text" pattern="[0-9]{10}" id="edit-customer-phone" name="customer-phone" placeholder="Nhập số điện thoại"><br>
-                <label for="edit-customer-last-name">Họ đệm:</label>
-                <input type="text" id="edit-customer-last-name" name="customer-last-name" placeholder="Nhập họ đệm"><br>
-                <label for="edit-customer-first-name">Tên:</label>
-                <input type="text" id="edit-customer-first-name" name="customer-first-name" placeholder="Nhập tên"><br>
-                <label for="edit-customer-address">Địa chỉ:</label>
-                <input type="text" id="edit-customer-address" name="customer-address" placeholder="Nhập địa chỉ"><br>
-                <button type="submit">Lưu thay đổi</button>
-              </form>
-            <table>
-              <thead>
-                <tr>
-                  <th>Mã khách hàng</th>
-                  <th>Số điện thoại</th>
-                  <th>Họ đệm</th>
-                  <th>Tên</th>
-                  <th>Địa chỉ</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for row in customer_info %}
-                <tr>
-                  <td>{{ row.MaKH }}</td>
-                  <td>{{ row.SDT }}</td>
-                  <td>{{ row.HoDem }}</td>
-                  <td>{{ row.Ten }}</td>
-                  <td>{{ row.DiaChi }}</td>
-                  <td>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Mã khách hàng</th>
+                    <th>Số điện thoại</th>
+                    <th>Họ đệm</th>
+                    <th>Tên</th>
+                    <th>Địa chỉ</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in customer_info %}
+                  <tr>
+                    <td>{{ row.MaKH }}</td>
+                    <td>{{ row.SDT }}</td>
+                    <td>{{ row.HoDem }}</td>
+                    <td>{{ row.Ten }}</td>
+                    <td>{{ row.DiaChi }}</td>
+                    <td>
                       <button onclick="deleteCustomer('{{ row.MaKH }}')">Xóa</button>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+                      <button onclick="showEditForm('{{ row.MaKH }}')">Sửa</button>
+                      <form id="edit-form-{{ row.MaKH }}" style="display: none;" onsubmit="return editCustomer('{{ row.MaKH }}')">
+                        <input type="hidden" name="customer-id" value="{{ row.MaKH }}">
+                        <label for="edit-customer-phone-{{ row.MaKH }}">Số điện thoại:</label>
+                        <input type="text" pattern="[0-9]{10}" id="edit-customer-phone-{{ row.MaKH }}" name="customer-phone" value="{{ row.SDT }}" required><br>
+                        <label for="edit-customer-last-name-{{ row.MaKH }}">Họ đệm:</label>
+                        <input type="text" id="edit-customer-last-name-{{ row.MaKH }}" name="customer-last-name" value="{{ row.HoDem }}" required><br>
+                        <label for="edit-customer-first-name-{{ row.MaKH }}">Tên:</label>
+                        <input type="text" id="edit-customer-first-name-{{ row.MaKH }}" name="customer-first-name" value="{{ row.Ten }}" required><br>
+                        <label for="edit-customer-address-{{ row.MaKH }}">Địa chỉ:</label>
+                        <input type="text" id="edit-customer-address-{{ row.MaKH }}" name="customer-address" value="{{ row.DiaChi }}" required><br>
+                        <button type="submit">Lưu thay đổi</button>
+                      </form>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             <script>
+            function showEditForm(customerId) {
+              const form = document.getElementById(`edit-form-${customerId}`);
+              form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            }
+
+            function editCustomer(customerId) {
+              const form = document.getElementById(`edit-form-${customerId}`);
+              const formData = new FormData(form);
+
+              fetch('/sua_kh', {
+                method: 'POST',
+                body: formData
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.status === 'success') {
+                  alert(data.message);
+                  location.reload(); // Refresh trang sau khi sửa thành công
+                } else {
+                  alert(data.message);
+                }
+              })
+              .catch((error) => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi sửa thông tin khách hàng.');
+              });
+
+              return false; // Ngăn form submit theo cách thông thường
+            }
             function deleteCustomer(customerId) {
               if (confirm('Bạn có chắc chắn muốn xóa khách hàng này?')) {
                 fetch(`/xoa_kh/${customerId}`, {
@@ -812,7 +957,7 @@
         
           <section id="employee-info">
             <h2>Quản lý thông tin nhân viên</h2>
-            <form method="POST" action="{{ url_for('them_nv') }}">
+            <form id="add-employee-form" method="POST" action="{{ url_for('them_nv') }}">
               <label for="employee-id">Mã nhân viên:</label>
               <input type="text" required pattern="^NV.*$" id="employee-id" name="employee-id" value="{{ next_employee_id}}" readonly><br>
               <label for="employee-last-name">Họ đệm:</label>
@@ -826,8 +971,12 @@
               <label for="employee-salary">Lương:</label>
               <input type="text" id="employee-salary" name="employee-salary" placeholder="Nhập lương"><br>
               <label for="employee-type">Loại nhân viên:</label>
-              <input type="text" id="employee-type" name="employee-type" placeholder="Nhập loại nhân viên"><br>
-              <button type="submit">Thêm thông tin nhân viên</button>
+              <select id="employee-type" name="employee-type" required>
+                <option value="">Chọn loại nhân viên</option>
+                <option value="Tiếp viên">Tiếp viên</option>
+                <option value="Phi công">Phi công</option>
+              </select><br>
+              <button type="button" onclick="addEmployee()">Thêm thông tin nhân viên</button>
             </form>
 
             <table>
@@ -854,30 +1003,107 @@
                   <td>{{ row.Luong }}</td>
                   <td>{{ row.LoaiNV }}</td>
                   <td>
-                    <form method="POST" action="{{ url_for('xoa_nv', employee_id=row.MaNV) }}" onsubmit="return confirm('Bạn có chắc chắn muốn xóa nhân viên này?');">
-                      <button type="submit">Xóa</button>
-                    </form>
-                    <form method="POST" action="{{ url_for('sua_nv', employee_id=row.MaNV) }}">
-                        <input type="hidden" name="employee-id" value="{{ row.MaNV }}">
-                        <label for="edit-employee-last-name">Họ đệm:</label>
-                        <input type="text" id="edit-employee-last-name" name="employee-last-name" value="{{ row.HoDem }}" required><br>
-                        <label for="edit-employee-first-name">Tên:</label>
-                        <input type="text" id="edit-employee-first-name" name="employee-first-name" value="{{ row.Ten }}" required><br>
-                        <label for="edit-employee-phone">Số điện thoại:</label>
-                        <input type="text" id="edit-employee-phone" name="employee-phone" value="{{ row.SDT }}" required><br>
-                        <label for="edit-employee-address">Địa chỉ:</label>
-                        <input type="text" id="edit-employee-address" name="employee-address" value="{{ row.DiaChi }}" required><br>
-                        <label for="edit-employee-salary">Lương:</label>
-                        <input type="text" id="edit-employee-salary" name="employee-salary" value="{{ row.Luong }}" required><br>
-                        <label for="edit-employee-type">Loại nhân viên:</label>
-                        <input type="text" id="edit-employee-type" name="employee-type" value="{{ row.LoaiNV }}" required><br>
-                        <button type="submit">Lưu thay đổi</button>
+                    <button onclick="deleteEmployee('{{ row.MaNV }}')">Xóa</button>
+                    <button onclick="showEditForm('{{ row.MaNV }}')">Sửa</button>
+                    <form id="edit-form-{{ row.MaNV }}" style="display: none;" onsubmit="return editEmployee('{{ row.MaNV }}')">
+                      <input type="hidden" name="employee-id" value="{{ row.MaNV }}">
+                      <label for="edit-employee-last-name-{{ row.MaNV }}">Họ đệm:</label>
+                      <input type="text" id="edit-employee-last-name-{{ row.MaNV }}" name="employee-last-name" value="{{ row.HoDem }}" required><br>
+                      <label for="edit-employee-first-name-{{ row.MaNV }}">Tên:</label>
+                      <input type="text" id="edit-employee-first-name-{{ row.MaNV }}" name="employee-first-name" value="{{ row.Ten }}" required><br>
+                      <label for="edit-employee-phone-{{ row.MaNV }}">Số điện thoại:</label>
+                      <input type="text" id="edit-employee-phone-{{ row.MaNV }}" name="employee-phone" value="{{ row.SDT }}" required><br>
+                      <label for="edit-employee-address-{{ row.MaNV }}">Địa chỉ:</label>
+                      <input type="text" id="edit-employee-address-{{ row.MaNV }}" name="employee-address" value="{{ row.DiaChi }}" required><br>
+                      <label for="edit-employee-salary-{{ row.MaNV }}">Lương:</label>
+                      <input type="text" id="edit-employee-salary-{{ row.MaNV }}" name="employee-salary" value="{{ row.Luong }}" required><br>
+                      <label for="edit-employee-type-{{ row.MaNV }}">Loại nhân viên:</label>
+                      <select id="edit-employee-type-{{ row.MaNV }}" name="employee-type" required>
+                        <option value="Tiếp viên" {% if row.LoaiNV == 'Tiếp viên' %}selected{% endif %}>Tiếp viên</option>
+                        <option value="Phi công" {% if row.LoaiNV == 'Phi công' %}selected{% endif %}>Phi công</option>
+                      </select><br>
+                      <button type="submit">Lưu thay đổi</button>
                     </form>
                   </td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
+            <script>
+              function showEditForm(employeeId) {
+                const form = document.getElementById(`edit-form-${employeeId}`);
+                form.style.display = form.style.display === 'none' ? 'block' : 'none';
+              }
+              function editEmployee(employeeId) {
+                const form = document.getElementById(`edit-form-${employeeId}`);
+                const formData = new FormData(form);
+
+                fetch(`/sua_nv/${employeeId}`, {
+                  method: 'POST',
+                  body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.status === 'success') {
+                    alert(data.message);
+                    location.reload(); // Refresh trang sau khi sửa thành công
+                  } else {
+                    alert(data.message);
+                  }
+                })
+                .catch((error) => {
+                  console.error('Error:', error);
+                  alert('Có lỗi xảy ra khi sửa thông tin nhân viên.');
+                });
+
+                return false; // Ngăn form submit theo cách thông thường
+              }
+              function deleteEmployee(employeeId) {
+                if (confirm('Bạn có chắc chắn muốn xóa nhân viên này?')) {
+                  fetch(`/xoa_nv/${employeeId}`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.status === 'success') {
+                      alert(data.message);
+                      location.reload(); // Chỉ refresh khi xóa thành công
+                    } else {
+                      alert(data.message);
+                    }
+                  })
+                  .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi xóa nhân viên.');
+                  });
+                }
+              }
+              function addEmployee() {
+                const form = document.getElementById('add-employee-form');
+                const formData = new FormData(form);
+
+                fetch('/them_nv', {
+                  method: 'POST',
+                  body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.status === 'success') {
+                    alert(data.message);
+                    location.reload(); // Refresh trang sau khi thêm thành công
+                  } else {
+                    alert(data.message);
+                  }
+                })
+                .catch((error) => {
+                  console.error('Error:', error);
+                  alert('Có lỗi xảy ra khi thêm nhân viên.');
+                });
+              }
+            </script>
           </section>  
 
           <section id="schedule-info">

@@ -199,6 +199,20 @@ def admin():
     cursor.execute(query)
     plane_info = [dict(SoHieu=row[0], MaLoai=row[1], SoGheNgoi=row[2]) for row in cursor.fetchall()]
 
+    # Lấy danh sách loại máy bay
+    query_plane_types = "SELECT MaLoai, HangSanXuat FROM LoaiMayBay"
+    cursor.execute(query_plane_types)
+    plane_types = [dict(MaLoai=row[0], HangSanXuat=row[1]) for row in cursor.fetchall()]
+
+    # Lấy thông tin máy bay, kết hợp với thông tin loại máy bay
+    query_planes = """
+    SELECT MayBay.SoHieu, MayBay.MaLoai, LoaiMayBay.HangSanXuat, MayBay.SoGheNgoi 
+    FROM MayBay 
+    JOIN LoaiMayBay ON MayBay.MaLoai = LoaiMayBay.MaLoai
+    """
+    cursor.execute(query_planes)
+    plane_info = [dict(SoHieu=row[0], MaLoai=row[1], HangSanXuat=row[2], SoGheNgoi=row[3]) for row in cursor.fetchall()]
+
     # Lấy thông tin đầy đủ về nhân viên từ cơ sở dữ liệu
     query = "SELECT MaNV, HoDem, Ten, SDT, DiaChi, Luong, LoaiNV FROM NhanVien"
     cursor.execute(query)
@@ -321,7 +335,7 @@ def admin():
                            next_employee_id=next_employee_id,
                            next_plane_type_id=next_plane_type_id,
                            next_flight_id=next_flight_id,
-                           stats=stats,
+                           stats=stats, plane_types=plane_types,
                            flights=flights,
                            aircrafts=aircrafts,
                            schedules=schedules)
@@ -485,10 +499,16 @@ def them_cb():
     departure_time = datetime.strptime(request.form['departure-time'], "%Y-%m-%dT%H:%M")
     arrival_time = datetime.strptime(request.form['arrival-time'], "%Y-%m-%dT%H:%M")
 
+    # Kiểm tra sân bay đi và đến
+    if departure_airport == arrival_airport:
+        flash("Lỗi: Sân bay đi và đến phải khác nhau", "error")
+        return redirect(url_for('admin'))
+
     query = "INSERT INTO ChuyenBay (MaChuyenBay, TenSanBayDi, TenSanBayDen, GioDi, GioDen) VALUES (?, ?, ?, ?, ?)"
     values = (flight_id, departure_airport, arrival_airport, departure_time, arrival_time)
     cursor.execute(query, values)
     cnxn.commit()
+    flash("Thêm chuyến bay thành công", "success")
     return redirect(url_for('admin'))
 
 @app.route('/sua_cb', methods=['POST'])
@@ -498,18 +518,50 @@ def sua_cb():
     arrival_airport = request.form['arrival-airport']
     departure_time = datetime.strptime(request.form['departure-time'], "%Y-%m-%dT%H:%M")
     arrival_time = datetime.strptime(request.form['arrival-time'], "%Y-%m-%dT%H:%M")
+    
+    # Kiểm tra sân bay đi và đến
+    if departure_airport == arrival_airport:
+        return jsonify({"status": "error", "message": "Lỗi: Sân bay đi và đến phải khác nhau"})
+    
     query = "UPDATE ChuyenBay SET TenSanBayDi = ?, TenSanBayDen = ?, GioDi = ?, GioDen = ? WHERE MaChuyenBay = ?"
     values = (departure_airport, arrival_airport, departure_time, arrival_time, flight_id)
-    cursor.execute(query, values)
-    cnxn.commit()
-    return redirect(url_for('admin'))
-
+    
+    try:
+        cursor.execute(query, values)
+        cnxn.commit()
+        return jsonify({"status": "success", "message": "Cập nhật thông tin chuyến bay thành công"})
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"status": "error", "message": f"Lỗi khi cập nhật thông tin chuyến bay: {str(e)}"})
+    
 @app.route('/xoa_cb/<flight_id>', methods=['POST'])
 def xoa_cb(flight_id):
-    query = "DELETE FROM ChuyenBay WHERE MaChuyenBay = ?"
-    cursor.execute(query, (flight_id,))
-    cnxn.commit()
-    return redirect(url_for('admin'))
+    try:
+        # Kiểm tra xem chuyến bay có trong bảng LichBay, DatCho hoặc PhanCong không
+        check_query = """
+        SELECT COUNT(*) 
+        FROM (
+            SELECT MaChuyenBay FROM LichBay WHERE MaChuyenBay = ?
+            UNION ALL
+            SELECT MaChuyenBay FROM DatCho WHERE MaChuyenBay = ?
+            UNION ALL
+            SELECT MaChuyenBay FROM PhanCong WHERE MaChuyenBay = ?
+        ) AS UsedFlights
+        """
+        cursor.execute(check_query, (flight_id, flight_id, flight_id))
+        count = cursor.fetchone()[0]
+        
+        if count > 0:
+            return jsonify({"status": "error", "message": "Chuyến bay này đã được dùng để đặt Lịch bay, Đặt chỗ hoặc được Phân công nên không thể xóa!"})
+        else:
+            delete_query = "DELETE FROM ChuyenBay WHERE MaChuyenBay = ?"
+            cursor.execute(delete_query, (flight_id,))
+            cnxn.commit()
+            return jsonify({"status": "success", "message": "Đã xóa chuyến bay thành công"})
+    
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"status": "error", "message": f"Có lỗi xảy ra: {str(e)}"})
 
 ### Các hàm xử lý cho quản lý LOẠI MÁY BAY
 
@@ -519,26 +571,53 @@ def them_loai_mb():
     manufacturer = request.form['manufacturer']
     query = "INSERT INTO LoaiMayBay (MaLoai, HangSanXuat) VALUES (?, ?)"
     values = (plane_type_id, manufacturer)
-    cursor.execute(query, values)
-    cnxn.commit()
-    return redirect(url_for('admin', section='aircraft-types'))
+    try:
+        cursor.execute(query, values)
+        cnxn.commit()
+        return jsonify({"status": "success", "message": "Thêm loại máy bay thành công"})
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"status": "error", "message": f"Lỗi khi thêm loại máy bay: {str(e)}"})
 
-@app.route('/sua_loai_mb', methods=['POST'])
-def sua_loai_mb():
-    plane_type_id = request.form['plane-type-id']
+@app.route('/sua_loai_mb/<plane_type_id>', methods=['POST'])
+def sua_loai_mb(plane_type_id):
     manufacturer = request.form['manufacturer']
     query = "UPDATE LoaiMayBay SET HangSanXuat = ? WHERE MaLoai = ?"
     values = (manufacturer, plane_type_id)
-    cursor.execute(query, values)
-    cnxn.commit()
-    return redirect(url_for('admin', section='aircraft-types'))
+    try:
+        cursor.execute(query, values)
+        cnxn.commit()
+        return jsonify({"status": "success", "message": "Cập nhật thông tin loại máy bay thành công"})
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"status": "error", "message": f"Lỗi khi cập nhật thông tin loại máy bay: {str(e)}"})
 
 @app.route('/xoa_loai_mb/<plane_type_id>', methods=['POST'])
 def xoa_loai_mb(plane_type_id):
-    query = "DELETE FROM LoaiMayBay WHERE MaLoai = ?"
-    cursor.execute(query, (plane_type_id,))
-    cnxn.commit()
-    return redirect(url_for('admin', section='aircraft-types'))
+    try:
+        # Kiểm tra xem loại máy bay có trong bảng MayBay hoặc LichBay không
+        check_query = """
+        SELECT COUNT(*) 
+        FROM (
+            SELECT MaLoai FROM MayBay WHERE MaLoai = ?
+            UNION ALL
+            SELECT MaLoai FROM LichBay WHERE MaLoai = ?
+        ) AS UsedTypes
+        """
+        cursor.execute(check_query, (plane_type_id, plane_type_id))
+        count = cursor.fetchone()[0]
+        
+        if count > 0:
+            return jsonify({"status": "error", "message": "Loại máy bay này đã được sử dụng trong bảng Máy bay hoặc Lịch bay"})
+        else:
+            delete_query = "DELETE FROM LoaiMayBay WHERE MaLoai = ?"
+            cursor.execute(delete_query, (plane_type_id,))
+            cnxn.commit()
+            return jsonify({"status": "success", "message": "Đã xóa loại máy bay thành công"})
+    
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"status": "error", "message": f"Có lỗi xảy ra: {str(e)}"})
 
 
 ### Các hàm xử lý cho quản lý ĐẶT CHỖ
@@ -714,14 +793,19 @@ def sua_mb():
 def xoa_mb(plane_id):
     try:
         # Kiểm tra xem máy bay có trong LichBay không
-        check_query = "SELECT COUNT(*) FROM LichBay WHERE SoHieu = ?"
-        cursor.execute(check_query, (plane_id,))
-        count = cursor.fetchone()[0]
+        check_schedule_query = "SELECT COUNT(*) FROM LichBay WHERE SoHieu = ?"
+        cursor.execute(check_schedule_query, (plane_id,))
+        schedule_count = cursor.fetchone()[0]
 
-        if count > 0:
-            return jsonify({'success': False, 'message': f'Không thể xóa máy bay {plane_id} vì đã được sử dụng trong lịch bay.'})
+        # Kiểm tra xem máy bay có trong LoaiMayBay không
+        check_type_query = "SELECT COUNT(*) FROM LoaiMayBay WHERE MaLoai IN (SELECT MaLoai FROM MayBay WHERE SoHieu = ?)"
+        cursor.execute(check_type_query, (plane_id,))
+        type_count = cursor.fetchone()[0]
+
+        if schedule_count > 0 or type_count > 0:
+            return jsonify({'success': False, 'message': 'Máy bay đang được sử dụng trong bảng Lịch bay hoặc Loại máy bay'})
         else:
-            # Nếu không có trong LichBay, tiến hành xóa
+            # Nếu không có trong LichBay và LoaiMayBay, tiến hành xóa
             delete_query = "DELETE FROM MayBay WHERE SoHieu = ?"
             cursor.execute(delete_query, (plane_id,))
             cnxn.commit()
@@ -785,11 +869,17 @@ def sua_kh():
     customer_last_name = request.form['customer-last-name']
     customer_first_name = request.form['customer-first-name']
     customer_address = request.form['customer-address']
+
     query = "UPDATE KhachHang SET SDT = ?, HoDem = ?, Ten = ?, DiaChi = ? WHERE MaKH = ?"
     values = (customer_phone, customer_last_name, customer_first_name, customer_address, customer_id)
-    cursor.execute(query, values)
-    cnxn.commit()
-    return redirect(url_for('admin'))
+
+    try:
+        cursor.execute(query, values)
+        cnxn.commit()
+        return jsonify({"status": "success", "message": "Cập nhật thông tin khách hàng thành công"})
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"status": "error", "message": f"Lỗi khi cập nhật thông tin khách hàng: {str(e)}"})
 
 @app.route('/xoa_kh/<customer_id>', methods=['POST'])
 def xoa_kh(customer_id):
@@ -815,7 +905,6 @@ def xoa_kh(customer_id):
 
 ### Các hàm xử lý cho quản lý NHÂN VIÊN
 
-
 @app.route('/them_nv', methods=['POST'])
 def them_nv():
     employee_id = request.form['employee-id']
@@ -826,11 +915,20 @@ def them_nv():
     employee_salary = request.form['employee-salary']
     employee_type = request.form['employee-type']
 
+    # Kiểm tra xem loại nhân viên có hợp lệ không
+    if employee_type not in ['Tiếp viên', 'Phi công']:
+        return jsonify({"status": "error", "message": "Loại nhân viên không hợp lệ"})
+
     query = "INSERT INTO NhanVien (MaNV, HoDem, Ten, SDT, DiaChi, Luong, LoaiNV) VALUES (?, ?, ?, ?, ?, ?, ?)"
     values = (employee_id, employee_last_name, employee_first_name, employee_phone, employee_address, employee_salary, employee_type)
-    cursor.execute(query, values)
-    cnxn.commit()
-    return redirect(url_for('admin'))
+    
+    try:
+        cursor.execute(query, values)
+        cnxn.commit()
+        return jsonify({"status": "success", "message": "Thêm nhân viên thành công"})
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"status": "error", "message": f"Lỗi khi thêm nhân viên: {str(e)}"})
 
 @app.route('/sua_nv/<employee_id>', methods=['POST'])
 def sua_nv(employee_id):
@@ -841,18 +939,46 @@ def sua_nv(employee_id):
     employee_salary = request.form['employee-salary']
     employee_type = request.form['employee-type']
 
+    if employee_type not in ['Tiếp viên', 'Phi công']:
+        return jsonify({"status": "error", "message": "Loại nhân viên không hợp lệ"})
+
+    try:
+        employee_salary = float(employee_salary)
+    except ValueError:
+        return jsonify({"status": "error", "message": "Lương phải là một số hợp lệ"})
+
     query = "UPDATE NhanVien SET HoDem = ?, Ten = ?, SDT = ?, DiaChi = ?, Luong = ?, LoaiNV = ? WHERE MaNV = ?"
     values = (employee_last_name, employee_first_name, employee_phone, employee_address, employee_salary, employee_type, employee_id)
-    cursor.execute(query, values)
-    cnxn.commit()
-    return redirect(url_for('admin'))
+
+    try:
+        cursor.execute(query, values)
+        cnxn.commit()
+        return jsonify({"status": "success", "message": "Cập nhật thông tin nhân viên thành công"})
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"status": "error", "message": f"Lỗi khi cập nhật thông tin nhân viên: {str(e)}"})
 
 @app.route('/xoa_nv/<employee_id>', methods=['POST'])
 def xoa_nv(employee_id):
-    query = "DELETE FROM NhanVien WHERE MaNV = ?"
-    cursor.execute(query, (employee_id,))
-    cnxn.commit()
-    return redirect(url_for('admin')) 
+    try:
+        # Kiểm tra xem nhân viên có trong bảng PhanCong không
+        check_query = "SELECT COUNT(*) FROM PhanCong WHERE MaNV = ?"
+        cursor.execute(check_query, (employee_id,))
+        count = cursor.fetchone()[0]
+        
+        if count > 0:
+            # Nếu có, không xóa và trả về thông báo lỗi
+            return jsonify({"status": "error", "message": "Không thể xóa nhân viên này vì đã được phân công."})
+        else:
+            # Nếu không, tiến hành xóa
+            delete_query = "DELETE FROM NhanVien WHERE MaNV = ?"
+            cursor.execute(delete_query, (employee_id,))
+            cnxn.commit()
+            return jsonify({"status": "success", "message": "Đã xóa nhân viên thành công."})
+    
+    except Exception as e:
+        cnxn.rollback()
+        return jsonify({"status": "error", "message": f"Có lỗi xảy ra: {str(e)}"})
 
 
 ### Các hàm xử lý cho quản lý LỊCH BAY
