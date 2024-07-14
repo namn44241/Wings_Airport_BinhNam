@@ -391,37 +391,37 @@
                 }
             }
 
-            // Xử lý sự kiện submit form đặt chỗ
-            document.getElementById('bookingForm').addEventListener('submit', function(e) {
-                e.preventDefault();
+            // // Xử lý sự kiện submit form đặt chỗ
+            // document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            //     e.preventDefault();
                 
-                const formData = new FormData(this);
+            //     const formData = new FormData(this);
                 
-                // Lấy NgayDi từ GioDi
-                const departureDatetime = new Date(formData.get('departure-datetime'));
-                const ngayDi = departureDatetime.toISOString().split('T')[0]; // Lấy phần yyyy-mm-dd
-                formData.append('ngay_di', ngayDi);
+            //     // Lấy NgayDi từ GioDi
+            //     const departureDatetime = new Date(formData.get('departure-datetime'));
+            //     const ngayDi = departureDatetime.toISOString().split('T')[0]; // Lấy phần yyyy-mm-dd
+            //     formData.append('ngay_di', ngayDi);
 
-                fetch(`${API_BASE_URL}/them_dat_cho_fe`, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.success);
-                        // Reset form
-                        this.reset();
-                        document.getElementById('manage-customer-id').value = '';
-                    } else {
-                        alert(data.error || 'Có lỗi xảy ra khi đặt chỗ');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi gửi yêu cầu' + error.message);
-                });
-            });
+            //     fetch(`${API_BASE_URL}/them_dat_cho_fe`, {
+            //         method: 'POST',
+            //         body: formData
+            //     })
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         if (data.success) {
+            //             alert(data.success);
+            //             // Reset form
+            //             this.reset();
+            //             document.getElementById('manage-customer-id').value = '';
+            //         } else {
+            //             alert(data.error || 'Có lỗi xảy ra khi đặt chỗ');
+            //         }
+            //     })
+            //     .catch(error => {
+            //         console.error('Error:', error);
+            //         alert('Có lỗi xảy ra khi gửi yêu cầu' + error.message);
+            //     });
+            // });
 
             const lastRegisteredCustomerId = localStorage.getItem('lastRegisteredCustomerId');
             if (lastRegisteredCustomerId) {

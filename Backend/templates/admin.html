@@ -200,9 +200,9 @@
               <label for="flight-id">Mã chuyến bay:</label>
                 <input type="text" required pattern="^CB.*$" id="flight-id" name="flight-id" value="{{ next_flight_id }}" readonly><br>
               <label for="departure-airport">Sân bay đi:</label>
-              <input type="text" id="departure-airport" name="departure-airport" placeholder="Nhập Sân bay đi"><br>
+              <input type="text" id="departure-airport" name="departure-airport" placeholder="Nhập Sân bay đi" required><br>
               <label for="arrival-airport">Sân bay đến:</label>
-              <input type="text" id="arrival-airport" name="arrival-airport" placeholder="Nhập Sân bay đến"><br>
+              <input type="text" id="arrival-airport" name="arrival-airport" placeholder="Nhập Sân bay đến" required><br>
               <label for="departure-time">Giờ đi:</label>
               <input type="datetime-local" id="departure-time" name="departure-time" required><br>
               <label for="arrival-time">Giờ đến:</label>
@@ -851,13 +851,13 @@
               <label for="customer-id">Mã khách hàng:</label>
               <input type="text" required pattern="^KH.*$" id="customer-id" name="customer-id" value="{{ next_customer_id }}" readonly><br>
               <label for="customer-phone">Số điện thoại:</label>
-              <input type="text" pattern="[0-9]{10}" id="customer-phone" name="customer-phone" placeholder="Nhập số điện thoại"><br>
+              <input type="text" pattern="[0-9]{10}" id="customer-phone" name="customer-phone" placeholder="Nhập số điện thoại" required><br>
               <label for="customer-last-name">Họ đệm:</label>
-              <input type="text" id="customer-last-name" name="customer-last-name" placeholder="Nhập họ đệm"><br>
+              <input type="text" id="customer-last-name" name="customer-last-name" placeholder="Nhập họ đệm" required><br>
               <label for="customer-first-name">Tên:</label>
-              <input type="text" id="customer-first-name" name="customer-first-name" placeholder="Nhập tên"><br>
+              <input type="text" id="customer-first-name" name="customer-first-name" placeholder="Nhập tên" required><br>
               <label for="customer-address">Địa chỉ:</label>
-              <input type="text" id="customer-address" name="customer-address" placeholder="Nhập địa chỉ"><br>
+              <input type="text" id="customer-address" name="customer-address" placeholder="Nhập địa chỉ" required><br>
               <button type="submit">Thêm thông tin khách hàng</button>
             </form>
               <table>
@@ -961,15 +961,15 @@
               <label for="employee-id">Mã nhân viên:</label>
               <input type="text" required pattern="^NV.*$" id="employee-id" name="employee-id" value="{{ next_employee_id}}" readonly><br>
               <label for="employee-last-name">Họ đệm:</label>
-              <input type="text" id="employee-last-name" name="employee-last-name" placeholder="Nhập họ đệm"><br>
+              <input type="text" id="employee-last-name" name="employee-last-name" placeholder="Nhập họ đệm" required><br>
               <label for="employee-first-name">Tên:</label>
-              <input type="text" id="employee-first-name" name="employee-first-name" placeholder="Nhập tên"><br>
+              <input type="text" id="employee-first-name" name="employee-first-name" placeholder="Nhập tên" required><br>
               <label for="employee-phone">Số điện thoại:</label>
-              <input type="text" pattern="[0-9]{10}" id="employee-phone" name="employee-phone" placeholder="Nhập số điện thoại"><br>
+              <input type="text" pattern="[0-9]{10}" id="employee-phone" name="employee-phone" placeholder="Nhập số điện thoại" required><br>
               <label for="employee-address">Địa chỉ:</label>
-              <input type="text" id="employee-address" name="employee-address" placeholder="Nhập địa chỉ"><br>
+              <input type="text" id="employee-address" name="employee-address" placeholder="Nhập địa chỉ" required><br>
               <label for="employee-salary">Lương:</label>
-              <input type="text" id="employee-salary" name="employee-salary" placeholder="Nhập lương"><br>
+              <input type="text" id="employee-salary" name="employee-salary" placeholder="Nhập lương" required><br>
               <label for="employee-type">Loại nhân viên:</label>
               <select id="employee-type" name="employee-type" required>
                 <option value="">Chọn loại nhân viên</option>
