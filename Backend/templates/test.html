@@ -1,62 +1,362 @@
-<section id="schedule-info">
-    <!-- Form for managing flight schedule information -->
-    <h2>Quản lý lịch bay</h2>
-    <form method="POST" action="{{ url_for('them_lich') }}">
-        <label for="flight-id">Mã chuyến bay:</label>
-        <input type="text" id="flight-id" name="flight-id" placeholder="Mã Chuyến bay" required><br>
-        <label for="aircraft-id">Số hiệu máy bay:</label>
-        <input type="text" id="aircraft-id" name="aircraft-id" placeholder="Số hiệu máy bay" required><br>
-        <label for="aircraft-type-id">Mã loại máy bay:</label>
-        <input type="text" id="aircraft-type-id" name="aircraft-type-id" placeholder="Mã loại máy bay" required><br>
-        <label for="departure-date">Ngày đi:</label>
-        <input type="date" id="departure-date" name="departure-date" placeholder="Nhập ngày đi" required><br>
-        <button type="submit">Thêm lịch bay mới</button>
+<div class="navbar">
+    <div id="nav-booking" onclick="showContainer('booking')">ĐĂNG KÝ KHÁCH HÀNG</div>
+    <div id="nav-manage" onclick="showContainer('manage')">ĐẶT CHỖ</div>
+    <div id="nav-checkin" onclick="showContainer('checkin')">TRA CỨU CHUYẾN BAY, LỊCH BAY</div>
+</div>
+<div class="overlay1" id="overlay1"></div>
+<!-- Đăng ký khách hàng -->
+<div class="container" id="booking-container" style="display: none;">
+    <form id="customer-form">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="customer-id">Mã khách hàng</label>
+                <input type="text" id="customer-id" name="customer-id" readonly>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="customer-phone">Số điện thoại</label>
+                <input type="tel" id="customer-phone" name="customer-phone" pattern="[0-9]{10}" required>
+                <label for="customer-address">Địa chỉ</label>
+                <input type="text" id="customer-address" name="customer-address" required>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="customer-last-name">Họ đệm</label>
+                <input type="text" id="customer-last-name" name="customer-last-name" required>
+                <label for="customer-first-name">Tên khách hàng</label>
+                <input type="text" id="customer-first-name" name="customer-first-name" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <button type="submit" style="width: 150px;">Đăng ký</button>
+        </div>
     </form>
+</div>
 
-    <!-- Table for displaying flight schedule information -->
-    <table>
-        <thead>
-            <tr>
-                <th>Ngày đi</th>
-                <th>Mã chuyến bay</th>
-                <th>Số hiệu máy bay</th>
-                <th>Mã loại máy bay</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for schedule_row in schedule_info %}
-            <tr>
-                <td>{{ schedule_row.NgayDi }}</td>
-                <td>{{ schedule_row.MaChuyenBay }}</td>
-                <td>{{ schedule_row.SoHieu }}</td>
-                <td>{{ schedule_row.MaLoai }}</td>
-                <td>
-                    <!-- Form để sửa thông tin lịch bay -->
-                    <form method="POST" action="{{ url_for('sua_lich') }}">
-                        <input type="hidden" name="schedule-id" value="{{ schedule_row.MaChuyenBay }}">
-                        <label for="edit-flight-id">Mã chuyến bay*:</label>
-                        <input type="text" id="edit-flight-id" name="flight-id" value="{{ schedule_row.SoHieu }}" required><br>
-                        <label for="edit-aircraft-id">Số hiệu máy bay:</label>
-                        <input type="text" id="edit-aircraft-id" name="aircraft-id" value="{{ schedule_row.MaLoai }}" required><br>
-                        <label for="edit-aircraft-type-id">Mã loại máy bay:</label>
-                        <input type="text" id="edit-aircraft-type-id" name="aircraft-type-id" value="{{ schedule_row.NgayDi }}" required><br>
-                        <label for="edit-departure-date">Ngày đi:</label>
-                        <input type="date" id="edit-departure-date" name="departure-date" value="{{ schedule_row.NgayDi }}" required><br>
-                        <button type="submit">Lưu thay đổi</button>
-                    </form>
+<!-- ĐẶT CHỖ -->
+<!-- <div class="container" id="manage-container" style="display: none;">
+    <div class="form-group">
+        <label for="manage-customer-id">Mã khách hàng</label>
+        <input type="text" id="manage-customer-id" readonly>
+    </div>
+    <div class="form-group">
+        <label for="manage-flight-id">Mã chuyến bay</label>
+        <input type="text" id="manage-flight-id" placeholder="">
+    </div>
+    <div class="form-group">
+        <label for="manage-departure-date">Ngày đi</label>
+        <input type="date" id="manage-departure-date" placeholder="">
+    </div>
+    <div class="form-group">
+        <button style="width: 150px;">Đặt chỗ</button>
+    </div>
+</div> -->
 
-                    <!-- Form để xóa lịch bay -->
-                    <form method="POST" action="{{ url_for('xoa_lich') }}">
-                      <input type="hidden" name="flight-id" value="{{ schedule_row.MaChuyenBay }}"> <!-- Add this line -->
-                      <input type="hidden" name="schedule-id" value="{{ schedule_row.MaLichBay }}">
-                      <button type="submit" onclick="return confirm('Bạn có chắc chắn muốn xóa lịch bay này?');">Xóa</button>
-                  </form>
-                                       
+<div class="container" id="manage-container" style="display: none;">
+    <form id="themDatChoForm" method="POST" action="{{ url_for('them_dat_cho') }}">
+        <div class="form-group">
+            <label for="manage-customer-id">Mã khách hàng</label>
+            <input type="text" id="manage-customer-id" name="customer-id" readonly>
+        </div>
+        <div class="form-group">
+            <label for="flight-id">Mã chuyến bay:</label>
+            <select id="flight-id" name="flight-id" required onchange="updateFlightDetails(this.value)">
+                <option value="">-- Chọn Mã chuyến bay --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="booking-departure-datetime">Giờ đi:</label>
+            <input type="datetime-local" id="booking-departure-datetime" name="departure-datetime" required readonly>
+        </div>
+        <div class="form-group">
+            <label for="booking-arrival-datetime">Giờ đến:</label>
+            <input type="datetime-local" id="booking-arrival-datetime" name="arrival-datetime" required readonly>
+        </div>
+        <div class="form-group">
+            <button type="submit" style="width: 150px;">Đặt chỗ</button>
+        </div>
+    </form>
+</div>
 
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</section>      
+<!-- TRA CỨU CHUYẾN BAY, LỊCH BAY -->
+
+<div class="container" id="checkin-container" style="display: none;">
+    <form id="search-flight-form">
+        <p>Tìm kiếm mã chuyến bay:</p>
+        <input type="text" name="query" placeholder="Nhập từ khóa tìm kiếm VD: CB0000001..." required>
+        <input type="hidden" name="type" value="flight">
+        <button type="submit" style="background:#007BFF; border-style: none; color:hsl(0, 100%, 99%);  border-radius: 5px;  padding: 5px">Tìm kiếm</button>
+    </form>
+    <form id="search-airport-form">
+        <p>Tìm kiếm sân bay:</p>
+        <input type="text" name="query" placeholder="Nhập từ khóa tìm kiếm VD: Sân Bay Nội Bài..." required>
+        <input type="hidden" name="type" value="airport">
+        <button type="submit" style="background:#007BFF; border-style: none; color:#ffffff;  border-radius: 5px;  padding: 5px">Tìm kiếm</button>
+    </form>
+    <div class="table-container">
+        <table id="flight-table">
+            <thead>
+                <tr>
+                    <th>Mã chuyến bay</th>
+                    <th>Số hiệu máy bay</th>
+                    <th>Mã loại máy bay</th>
+                    <th>Sân bay đi</th>
+                    <th>Sân bay đến</th>
+                    <th>Ngày và giờ đi</th>
+                    <th>Ngày và giờ đến</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dữ liệu sẽ được thêm vào đây bằng JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const API_BASE_URL = 'http://127.0.0.1:5000';
+    const bookingContainer = document.getElementById('booking-container');
+    const manageContainer = document.getElementById('manage-container');
+    const checkinContainer = document.getElementById('checkin-container');
+
+    // Thêm event listeners cho navbar
+    document.getElementById('nav-booking').addEventListener('click', () => showContainer('booking'));
+    document.getElementById('nav-manage').addEventListener('click', () => showContainer('manage'));
+    document.getElementById('nav-checkin').addEventListener('click', () => showContainer('checkin'));
+
+    function showContainer(containerName) {
+        bookingContainer.style.display = 'none';
+        manageContainer.style.display = 'none';
+        checkinContainer.style.display = 'none';
+
+        switch(containerName) {
+            case 'booking':
+                bookingContainer.style.display = 'block';
+                initializeBooking();
+                break;
+            case 'manage':
+                manageContainer.style.display = 'block';
+                initializeManage();
+                break;
+            case 'checkin':
+                checkinContainer.style.display = 'block';
+                initializeCheckin();
+                break;
+        }
+    }
+
+    function initializeManage() {
+        const form = document.getElementById('themDatChoForm');
+        
+        // Fetch danh sách chuyến bay và điền vào dropdown
+        fetch(`${API_BASE_URL}/api/flights`)
+            .then(response => response.json())
+            .then(flights => {
+                const flightSelect = document.getElementById('flight-id');
+                flights.forEach(flight => {
+                    const option = document.createElement('option');
+                    option.value = flight.MaChuyenBay;
+                    option.textContent = `${flight.MaChuyenBay} - ${flight.TenSanBayDi} - ${flight.TenSanBayDen}`;
+                    flightSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            bookFlight();
+        });
+    }
+
+    function updateFlightDetails(flightId) {
+        if (flightId) {
+            fetch(`${API_BASE_URL}/get_flight_details?flight_id=${flightId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('booking-departure-datetime').value = data.departure_time;
+                    document.getElementById('booking-arrival-datetime').value = data.arrival_time;
+                })
+                .catch(error => console.error(error));
+        } else {
+            document.getElementById('booking-departure-datetime').value = '';
+            document.getElementById('booking-arrival-datetime').value = '';
+        }
+    }
+
+    function bookFlight() {
+        const form = document.getElementById('themDatChoForm');
+        const formData = new FormData(form);
+
+        fetch(`${API_BASE_URL}/them_dat_cho`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Đặt chỗ thành công!');
+                form.reset();
+            } else {
+                alert('Đặt chỗ thất bại: ' + data.message);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Đã xảy ra lỗi khi đặt chỗ');
+        });
+    }
+
+    function initializeBooking() {
+        const form = document.getElementById('customer-form');
+
+        fetchNextCustomerId();
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            fetch(`${API_BASE_URL}/them_kh_fe`, {
+                method: 'POST',
+                body: new FormData(this)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    document.getElementById('manage-customer-id').value = document.getElementById('customer-id').value;
+                    showContainer('manage');
+                } else {
+                    alert('Có lỗi xảy ra: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi gửi yêu cầu');
+            });
+        });
+    }
+
+    function fetchNextCustomerId() {
+        fetch(`${API_BASE_URL}/next_customer_id`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('customer-id').value = data.next_customer_id;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function initializeManage() {
+        document.getElementById('book-flight').addEventListener('click', bookFlight);
+    }
+
+    function bookFlight() {
+        const customerId = document.getElementById('manage-customer-id').value;
+        const flightId = document.getElementById('manage-flight-id').value;
+        const departureDate = document.getElementById('manage-departure-date').value;
+
+        fetch(`${API_BASE_URL}/api/book`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                customerId: customerId,
+                flightId: flightId,
+                departureDate: departureDate
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert('Đặt chỗ thành công!');
+            } else {
+                alert('Đặt chỗ thất bại: ' + data.error);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Đã xảy ra lỗi khi đặt chỗ');
+        });
+    }
+
+    function initializeCheckin() {
+        const tableBody = document.querySelector('#flight-table tbody');
+        
+        tableBody.innerHTML = '<tr><td colspan="7">Đang tải dữ liệu...</td></tr>';
+
+        fetch(`${API_BASE_URL}/api/flights`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                displayFlights(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                tableBody.innerHTML = '<tr><td colspan="7">Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.</td></tr>';
+            });
+
+        document.getElementById('search-flight-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const query = this.querySelector('input[name="query"]').value;
+            performSearch('flight', query);
+        });
+
+        document.getElementById('search-airport-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const query = this.querySelector('input[name="query"]').value;
+            performSearch('airport', query);
+        });
+    }
+
+    function performSearch(type, query) {
+        const tableBody = document.querySelector('#flight-table tbody');
+        const rows = tableBody.querySelectorAll('tr');
+        
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (type === 'flight') {
+                const flightCode = cells[0].textContent;
+                row.style.display = flightCode.toLowerCase().includes(query.toLowerCase()) ? '' : 'none';
+            } else if (type === 'airport') {
+                const departureAirport = cells[3].textContent;
+                const arrivalAirport = cells[4].textContent;
+                row.style.display = 
+                    departureAirport.toLowerCase().includes(query.toLowerCase()) ||
+                    arrivalAirport.toLowerCase().includes(query.toLowerCase()) ? '' : 'none';
+            }
+        });
+    }
+
+    function displayFlights(flights) {
+        const tableBody = document.querySelector('#flight-table tbody');
+        tableBody.innerHTML = ''; // Xóa nội dung cũ
+        
+        if (flights.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = '<td colspan="7">Không có dữ liệu</td>';
+            tableBody.appendChild(row);
+        } else {
+            flights.forEach(flight => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${flight.MaChuyenBay || 'N/A'}</td>
+                    <td>${flight.SoHieuMayBay || 'N/A'}</td>
+                    <td>${flight.MaLoaiMayBay || 'N/A'}</td>
+                    <td>${flight.TenSanBayDi || 'N/A'}</td>
+                    <td>${flight.TenSanBayDen || 'N/A'}</td>
+                    <td>${flight.GioDi || 'N/A'}</td>
+                    <td>${flight.GioDen || 'N/A'}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+    }
+});
+</script>

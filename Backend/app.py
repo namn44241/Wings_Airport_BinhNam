@@ -652,9 +652,94 @@ def them_dat_cho():
         cnxn.rollback()
         return jsonify({"error": f"Lỗi khi thêm đặt chỗ: {str(e)}"}), 500
 
+# @app.route('/them_dat_cho_fe', methods=['POST'])
+# def them_dat_cho_fe():
+#     cursor = None
+#     try:
+#         # Xử lý dữ liệu đầu vào
+#         if request.is_json:
+#             data = request.json
+#         else:
+#             data = request.form
+
+#         customer_id = data.get('customer-id')
+#         flight_id = data.get('flight-id')
+#         departure_datetime = data.get('departure-datetime')
+#         customer_email = data.get('customer-email')
+
+#         # Kiểm tra dữ liệu đầu vào
+#         if not all([customer_id, flight_id, departure_datetime, customer_email]):
+#             return jsonify({"error": "Thiếu thông tin đặt chỗ"}), 400
+
+#         # Chuyển đổi chuỗi ngày tháng
+#         departure_date = datetime.strptime(departure_datetime, '%Y-%m-%dT%H:%M')
+#         ngay_di = departure_date.strftime('%Y-%m-%d')
+
+#         cursor = cnxn.cursor()
+
+#         # Kiểm tra đặt chỗ đã tồn tại
+#         check_query = "SELECT COUNT(*) FROM DatCho WHERE MaKH = ? AND MaChuyenBay = ? AND NgayDi = ?"
+#         cursor.execute(check_query, (customer_id, flight_id, ngay_di))
+#         result = cursor.fetchone()
+#         if result and result[0] > 0:
+#             cursor.close()
+#             return jsonify({"error": "Đã tồn tại đặt chỗ cho khách hàng này trên chuyến bay này."}), 400
+
+#         # Thêm bản ghi mới
+#         insert_query = "INSERT INTO DatCho (MaKH, NgayDi, MaChuyenBay) VALUES (?, ?, ?)"
+#         cursor.execute(insert_query, (customer_id, ngay_di, flight_id))
+#         cursor.close()
+#         cnxn.commit()
+
+#         # Gửi email xác nhận
+#         try:
+#             subject = 'Xác nhận đặt chỗ - Wings Airport'
+#             html_body = f'''
+#             <html>
+#                 <body>
+#                     <h1>Xin chào,</h1>
+#                     <h3>Cảm ơn bạn đã đặt chỗ tại Wings Airport!</h3>
+#                     <p>Chi tiết đặt chỗ của bạn:</p>
+#                     <ul>
+#                         <li>Mã khách hàng: {customer_id}</li>
+#                         <li>Mã chuyến bay: {flight_id}</li>
+#                         <li>Ngày đi: {ngay_di}</li>
+#                     </ul>
+#                     <p>Chúc bạn có một chuyến bay tuyệt vời!</p>
+#                     <p>Trân trọng,<br>Đội ngũ Wings Airport</p>
+#                 </body>
+#             </html>
+#             '''
+
+#             msg = Message(subject,
+#                           sender='wingsairport73@gmail.com',
+#                           recipients=[customer_email])
+#             msg.html = html_body
+#             mail.send(msg)
+
+#             return jsonify({"success": "Thêm đặt chỗ thành công và email xác nhận đã được gửi."}), 200
+#         except Exception as email_error:
+#             print(f"Error sending email: {str(email_error)}")
+#             return jsonify({"success": "Thêm đặt chỗ thành công nhưng không gửi được email xác nhận."}), 200
+
+#     except pyodbc.Error as e:
+#         if cursor:
+#             cursor.close()
+#         cnxn.rollback()
+#         error_message = str(e)
+#         print(f"Database error: {error_message}")  # For server-side logging
+#         return jsonify({"error": f"Lỗi database: {error_message}"}), 500
+#     except Exception as e:
+#         if cursor:
+#             cursor.close()
+#         cnxn.rollback()
+#         error_message = str(e)
+#         print(f"Unexpected error: {error_message}")  # For server-side logging
+#         return jsonify({"error": f"Lỗi không xác định: {error_message}"}), 500
+
 @app.route('/them_dat_cho_fe', methods=['POST'])
 def them_dat_cho_fe():
-    cursor = cnxn.cursor()
+    cursor = None
     try:
         # Xử lý dữ liệu đầu vào
         if request.is_json:
@@ -665,42 +750,110 @@ def them_dat_cho_fe():
         customer_id = data.get('customer-id')
         flight_id = data.get('flight-id')
         departure_datetime = data.get('departure-datetime')
+        customer_email = data.get('customer-email')
 
         # Kiểm tra dữ liệu đầu vào
-        if not all([customer_id, flight_id, departure_datetime]):
+        if not all([customer_id, flight_id, departure_datetime, customer_email]):
             return jsonify({"error": "Thiếu thông tin đặt chỗ"}), 400
 
         # Chuyển đổi chuỗi ngày tháng
         departure_date = datetime.strptime(departure_datetime, '%Y-%m-%dT%H:%M')
         ngay_di = departure_date.strftime('%Y-%m-%d')
 
+        cursor = cnxn.cursor()
+
         # Kiểm tra đặt chỗ đã tồn tại
         check_query = "SELECT COUNT(*) FROM DatCho WHERE MaKH = ? AND MaChuyenBay = ? AND NgayDi = ?"
         cursor.execute(check_query, (customer_id, flight_id, ngay_di))
         result = cursor.fetchone()
         if result and result[0] > 0:
+            cursor.close()
             return jsonify({"error": "Đã tồn tại đặt chỗ cho khách hàng này trên chuyến bay này."}), 400
 
         # Thêm bản ghi mới
         insert_query = "INSERT INTO DatCho (MaKH, NgayDi, MaChuyenBay) VALUES (?, ?, ?)"
         cursor.execute(insert_query, (customer_id, ngay_di, flight_id))
         cnxn.commit()
-        
-        return jsonify({"success": "Thêm đặt chỗ thành công"}), 200
+
+        # Truy vấn để lấy thông tin chi tiết
+        detail_query = """
+        SELECT 
+            KH.MaKH, 
+            KH.HoDem + ' ' + KH.Ten AS HoTen, 
+            KH.SDT, 
+            KH.DiaChi,
+            CB.MaChuyenBay, 
+            CB.TenSanBayDi, 
+            CB.TenSanBayDen, 
+            CB.GioDi, 
+            CB.GioDen,
+            DC.NgayDi
+        FROM 
+            DatCho DC
+            JOIN KhachHang KH ON DC.MaKH = KH.MaKH
+            JOIN ChuyenBay CB ON DC.MaChuyenBay = CB.MaChuyenBay
+        WHERE 
+            DC.MaKH = ? AND DC.MaChuyenBay = ? AND DC.NgayDi = ?
+        """
+        cursor.execute(detail_query, (customer_id, flight_id, ngay_di))
+        booking_details = cursor.fetchone()
+        cursor.close()
+
+        if not booking_details:
+            return jsonify({"error": "Không tìm thấy thông tin đặt chỗ"}), 404
+
+        # Gửi email xác nhận
+        try:
+            subject = 'Xác nhận đặt chỗ - Wings Airport'
+            html_body = f'''
+            <html>
+                <body>
+                    <h1>Xin chào, {booking_details.HoTen}</h1>
+                    <h3>Cảm ơn bạn đã đặt chỗ tại Wings Airport!</h3>
+                    <p>Chi tiết đặt chỗ của bạn:</p>
+                    <ul>
+                        <li>Mã khách hàng: {booking_details.MaKH}</li>
+                        <li>Số điện thoại: {booking_details.SDT}</li>
+                        <li>Địa chỉ: {booking_details.DiaChi}</li>
+                        <li>Mã chuyến bay: {booking_details.MaChuyenBay}</li>
+                        <li>Ngày đi: {booking_details.NgayDi}</li>
+                        <li>Sân bay đi: {booking_details.TenSanBayDi}</li>
+                        <li>Sân bay đến: {booking_details.TenSanBayDen}</li>
+                        <li>Giờ đi: {booking_details.GioDi}</li>
+                        <li>Giờ đến: {booking_details.GioDen}</li>
+                    </ul>
+                    <p>Chúc bạn có một chuyến bay tuyệt vời!</p>
+                    <p>Trân trọng,<br>Đội ngũ Wings Airport</p>
+                </body>
+            </html>
+            '''
+
+            msg = Message(subject,
+                          sender='wingsairport73@gmail.com',
+                          recipients=[customer_email])
+            msg.html = html_body
+            mail.send(msg)
+
+            return jsonify({"success": "Thêm đặt chỗ thành công và email xác nhận đã được gửi."}), 200
+        except Exception as email_error:
+            print(f"Error sending email: {str(email_error)}")
+            return jsonify({"success": "Thêm đặt chỗ thành công nhưng không gửi được email xác nhận."}), 200
 
     except pyodbc.Error as e:
+        if cursor:
+            cursor.close()
         cnxn.rollback()
         error_message = str(e)
         print(f"Database error: {error_message}")  # For server-side logging
         return jsonify({"error": f"Lỗi database: {error_message}"}), 500
     except Exception as e:
+        if cursor:
+            cursor.close()
         cnxn.rollback()
         error_message = str(e)
         print(f"Unexpected error: {error_message}")  # For server-side logging
         return jsonify({"error": f"Lỗi không xác định: {error_message}"}), 500
-    finally:
-        cursor.close()
-
+    
 @app.route('/get_flight_details', methods=['GET'])
 def get_flight_details():
     flight_id = request.args.get('flight_id')
