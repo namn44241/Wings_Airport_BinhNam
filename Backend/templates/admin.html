@@ -851,7 +851,7 @@
               <label for="customer-id">Mã khách hàng:</label>
               <input type="text" required pattern="^KH.*$" id="customer-id" name="customer-id" value="{{ next_customer_id }}" readonly><br>
               <label for="customer-phone">Số điện thoại:</label>
-              <input type="text" pattern="[0-9]{10}" id="customer-phone" name="customer-phone" placeholder="Nhập số điện thoại" required><br>
+              <input type="text" pattern="0[0-9]{9}" id="customer-phone" name="customer-phone" placeholder="Nhập số điện thoại" required><br>
               <label for="customer-last-name">Họ đệm:</label>
               <input type="text" id="customer-last-name" name="customer-last-name" placeholder="Nhập họ đệm" required><br>
               <label for="customer-first-name">Tên:</label>
@@ -885,7 +885,7 @@
                       <form id="edit-form-{{ row.MaKH }}" style="display: none;" onsubmit="return editCustomer('{{ row.MaKH }}')">
                         <input type="hidden" name="customer-id" value="{{ row.MaKH }}">
                         <label for="edit-customer-phone-{{ row.MaKH }}">Số điện thoại:</label>
-                        <input type="text" pattern="[0-9]{10}" id="edit-customer-phone-{{ row.MaKH }}" name="customer-phone" value="{{ row.SDT }}" required><br>
+                        <input type="text" pattern="0[0-9]{9}" id="edit-customer-phone-{{ row.MaKH }}" name="customer-phone" value="{{ row.SDT }}" required><br>
                         <label for="edit-customer-last-name-{{ row.MaKH }}">Họ đệm:</label>
                         <input type="text" id="edit-customer-last-name-{{ row.MaKH }}" name="customer-last-name" value="{{ row.HoDem }}" required><br>
                         <label for="edit-customer-first-name-{{ row.MaKH }}">Tên:</label>
@@ -965,7 +965,7 @@
               <label for="employee-first-name">Tên:</label>
               <input type="text" id="employee-first-name" name="employee-first-name" placeholder="Nhập tên" required><br>
               <label for="employee-phone">Số điện thoại:</label>
-              <input type="text" pattern="[0-9]{10}" id="employee-phone" name="employee-phone" placeholder="Nhập số điện thoại" required><br>
+              <input type="text" pattern="0[0-9]{9}" id="employee-phone" name="employee-phone" placeholder="Nhập số điện thoại" required><br>
               <label for="employee-address">Địa chỉ:</label>
               <input type="text" id="employee-address" name="employee-address" placeholder="Nhập địa chỉ" required><br>
               <label for="employee-salary">Lương:</label>
@@ -1012,7 +1012,7 @@
                       <label for="edit-employee-first-name-{{ row.MaNV }}">Tên:</label>
                       <input type="text" id="edit-employee-first-name-{{ row.MaNV }}" name="employee-first-name" value="{{ row.Ten }}" required><br>
                       <label for="edit-employee-phone-{{ row.MaNV }}">Số điện thoại:</label>
-                      <input type="text" id="edit-employee-phone-{{ row.MaNV }}" name="employee-phone" value="{{ row.SDT }}" required><br>
+                      <input type="text" id="edit-employee-phone-{{ row.MaNV }}" pattern="0[0-9]{9}" name="employee-phone" value="{{ row.SDT }}" required><br>
                       <label for="edit-employee-address-{{ row.MaNV }}">Địa chỉ:</label>
                       <input type="text" id="edit-employee-address-{{ row.MaNV }}" name="employee-address" value="{{ row.DiaChi }}" required><br>
                       <label for="edit-employee-salary-{{ row.MaNV }}">Lương:</label>

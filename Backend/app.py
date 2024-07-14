@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, render_template_string, jsonify, session, flash
+from functools import wraps
 import pyodbc
 import os
 from datetime import datetime
@@ -14,6 +15,22 @@ app.secret_key = os.urandom(24)
 dsn = 'QuanLiSanBay'
 cnxn = pyodbc.connect(f'DSN={dsn}')
 cursor = cnxn.cursor()
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            if request.is_json:
+                return jsonify({"error": "Bạn chưa đăng nhập và không thể thực hiện thao tác này"}), 401
+            else:
+                return """
+                <script>
+                    alert('Bạn chưa đăng nhập và không thể thực hiện thao tác này');
+                    window.location.href = '/login';
+                </script>
+                """, 401
+        return f(*args, **kwargs)
+    return decorated_function
                            
 @app.route('/test_connection')
 def test_connection():
@@ -492,6 +509,7 @@ def book_flight():
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/them_cb', methods=['POST'])
+@login_required
 def them_cb():
     flight_id = request.form['flight-id']
     departure_airport = request.form['departure-airport']
@@ -512,6 +530,7 @@ def them_cb():
     return redirect(url_for('admin'))
 
 @app.route('/sua_cb', methods=['POST'])
+@login_required
 def sua_cb():
     flight_id = request.form['flight-id']
     departure_airport = request.form['departure-airport']
@@ -535,6 +554,7 @@ def sua_cb():
         return jsonify({"status": "error", "message": f"Lỗi khi cập nhật thông tin chuyến bay: {str(e)}"})
     
 @app.route('/xoa_cb/<flight_id>', methods=['POST'])
+@login_required
 def xoa_cb(flight_id):
     try:
         # Kiểm tra xem chuyến bay có trong bảng LichBay, DatCho hoặc PhanCong không
@@ -566,6 +586,7 @@ def xoa_cb(flight_id):
 ### Các hàm xử lý cho quản lý LOẠI MÁY BAY
 
 @app.route('/them_loai_mb', methods=['POST'])
+@login_required
 def them_loai_mb():
     plane_type_id = request.form['plane-type-id']
     manufacturer = request.form['manufacturer']
@@ -580,6 +601,7 @@ def them_loai_mb():
         return jsonify({"status": "error", "message": f"Lỗi khi thêm loại máy bay: {str(e)}"})
 
 @app.route('/sua_loai_mb/<plane_type_id>', methods=['POST'])
+@login_required
 def sua_loai_mb(plane_type_id):
     manufacturer = request.form['manufacturer']
     query = "UPDATE LoaiMayBay SET HangSanXuat = ? WHERE MaLoai = ?"
@@ -593,6 +615,7 @@ def sua_loai_mb(plane_type_id):
         return jsonify({"status": "error", "message": f"Lỗi khi cập nhật thông tin loại máy bay: {str(e)}"})
 
 @app.route('/xoa_loai_mb/<plane_type_id>', methods=['POST'])
+@login_required
 def xoa_loai_mb(plane_type_id):
     try:
         # Kiểm tra xem loại máy bay có trong bảng MayBay hoặc LichBay không
@@ -623,6 +646,7 @@ def xoa_loai_mb(plane_type_id):
 ### Các hàm xử lý cho quản lý ĐẶT CHỖ
 
 @app.route('/them_dat_cho', methods=['POST'])
+@login_required
 def them_dat_cho():
     customer_id = request.form['customer-id']
     flight_id = request.form['flight-id']
@@ -736,6 +760,7 @@ def them_dat_cho():
 #         error_message = str(e)
 #         print(f"Unexpected error: {error_message}")  # For server-side logging
 #         return jsonify({"error": f"Lỗi không xác định: {error_message}"}), 500
+    
 
 @app.route('/them_dat_cho_fe', methods=['POST'])
 def them_dat_cho_fe():
@@ -809,7 +834,8 @@ def them_dat_cho_fe():
             <html>
                 <body>
                     <h1>Xin chào, {booking_details.HoTen}</h1>
-                    <h3>Cảm ơn bạn đã đặt chỗ tại Wings Airport!</h3>
+                    <h3>Cảm ơn bạn đã đặt chỗ tại Wings Airport, chúc bạn một ngày tốt lành!</h3>
+                    <img width="480" height="269" src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExY281dmpqY3h2aXRobDNvaWwzbW1hNWozY281b3l6cWZpMHhpMmoxbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/n5H1abNYFl6F3KttyW/giphy-downsized-large.gif" alt="dat-cho">
                     <p>Chi tiết đặt chỗ của bạn:</p>
                     <ul>
                         <li>Mã khách hàng: {booking_details.MaKH}</li>
@@ -821,7 +847,10 @@ def them_dat_cho_fe():
                         <li>Sân bay đến: {booking_details.TenSanBayDen}</li>
                         <li>Giờ đi: {booking_details.GioDi}</li>
                         <li>Giờ đến: {booking_details.GioDen}</li>
+                        <li>Nhân viên phục vụ: Đang cập nhật..<li>
                     </ul>
+                    <p>Wings Airport tự hào là Sân bay hàng không quốc tế 4 sao.<br>
+                    Xin trân trọng cảm ơn sự đồng hành của Quý khách và bạn hàng!</p>
                     <p>Chúc bạn có một chuyến bay tuyệt vời!</p>
                     <p>Trân trọng,<br>Đội ngũ Wings Airport</p>
                 </body>
@@ -854,6 +883,7 @@ def them_dat_cho_fe():
         print(f"Unexpected error: {error_message}")  # For server-side logging
         return jsonify({"error": f"Lỗi không xác định: {error_message}"}), 500
     
+
 @app.route('/get_flight_details', methods=['GET'])
 def get_flight_details():
     flight_id = request.args.get('flight_id')
@@ -868,6 +898,7 @@ def get_flight_details():
     return jsonify({'error': 'Không tìm thấy chuyến bay'}), 404
 
 @app.route('/sua_dat_cho', methods=['POST'])
+@login_required
 def sua_dat_cho():
     customer_id = request.form['customer-id']
     new_flight_id = request.form['flight-id']
@@ -909,6 +940,7 @@ def sua_dat_cho():
         return jsonify({"error": f"Lỗi khi cập nhật đặt chỗ: {str(e)}"}), 500
 
 @app.route('/xoa_dat_cho', methods=['POST'])
+@login_required
 def xoa_dat_cho():
     customer_id = request.form['customer_id']
     flight_id = request.form['flight_id']
@@ -931,6 +963,7 @@ def xoa_dat_cho():
 ### Các hàm xử lý cho quản lý MÁY BAY
 
 @app.route('/them_mb', methods=['POST'])
+@login_required
 def them_mb():
     try:
         plane_id = request.form['plane-id']
@@ -963,6 +996,7 @@ def them_mb():
         return jsonify({'success': False, 'message': f'Lỗi khi thêm máy bay: {str(e)}'}), 500
 
 @app.route('/sua_mb', methods=['POST'])
+@login_required
 def sua_mb():
     try:
         plane_id = request.form['plane-id']
@@ -993,6 +1027,7 @@ def sua_mb():
         return jsonify({'success': False, 'message': f'Lỗi khi cập nhật máy bay: {str(e)}'})
 
 @app.route('/xoa_mb/<plane_id>', methods=['POST'])
+@login_required
 def xoa_mb(plane_id):
     try:
         # Kiểm tra xem máy bay có trong LichBay không
@@ -1020,6 +1055,7 @@ def xoa_mb(plane_id):
 ### Các hàm xử lý cho quản lý KHÁCH HÀNG
 
 @app.route('/them_kh', methods=['POST'])
+@login_required
 def them_kh():
     customer_id = request.form['customer-id']
     customer_phone = request.form['customer-phone']
@@ -1066,6 +1102,7 @@ def them_kh_fe():
         return jsonify({"success": False, "message": str(e)}), 500
     
 @app.route('/sua_kh', methods=['POST'])
+@login_required
 def sua_kh():
     customer_id = request.form['customer-id']
     customer_phone = request.form['customer-phone']
@@ -1085,6 +1122,7 @@ def sua_kh():
         return jsonify({"status": "error", "message": f"Lỗi khi cập nhật thông tin khách hàng: {str(e)}"})
 
 @app.route('/xoa_kh/<customer_id>', methods=['POST'])
+@login_required
 def xoa_kh(customer_id):
     try:
         # Kiểm tra xem khách hàng có trong bảng DatCho không
@@ -1109,6 +1147,7 @@ def xoa_kh(customer_id):
 ### Các hàm xử lý cho quản lý NHÂN VIÊN
 
 @app.route('/them_nv', methods=['POST'])
+@login_required
 def them_nv():
     employee_id = request.form['employee-id']
     employee_last_name = request.form['employee-last-name']
@@ -1134,6 +1173,7 @@ def them_nv():
         return jsonify({"status": "error", "message": f"Lỗi khi thêm nhân viên: {str(e)}"})
 
 @app.route('/sua_nv/<employee_id>', methods=['POST'])
+@login_required
 def sua_nv(employee_id):
     employee_last_name = request.form['employee-last-name']
     employee_first_name = request.form['employee-first-name']
@@ -1162,6 +1202,7 @@ def sua_nv(employee_id):
         return jsonify({"status": "error", "message": f"Lỗi khi cập nhật thông tin nhân viên: {str(e)}"})
 
 @app.route('/xoa_nv/<employee_id>', methods=['POST'])
+@login_required
 def xoa_nv(employee_id):
     try:
         # Kiểm tra xem nhân viên có trong bảng PhanCong không
@@ -1187,6 +1228,7 @@ def xoa_nv(employee_id):
 ### Các hàm xử lý cho quản lý LỊCH BAY
 
 @app.route('/them_lich', methods=['POST'])
+@login_required
 def them_lich():
     flight_id = request.form['flight-id']
     aircraft_id = request.form['aircraft-id']
@@ -1230,6 +1272,7 @@ def them_lich():
         return jsonify({"error": f"Lỗi khi thêm lịch bay: {str(e)}"}), 500
 
 @app.route('/sua_lich', methods=['POST'])
+@login_required
 def sua_lich():
     flight_id = request.form['flight-id']
     aircraft_id = request.form['aircraft-id']
@@ -1253,6 +1296,7 @@ def sua_lich():
         return jsonify({"error": f"Lỗi khi cập nhật lịch bay: {str(e)}"}), 500
 
 @app.route('/xoa_lich', methods=['POST'])
+@login_required
 def xoa_lich():
     flight_id = request.form['flight-id']
     aircraft_id = request.form['aircraft-id']
@@ -1289,6 +1333,7 @@ def xoa_lich():
 ### Các hàm xử lý cho quản lý PHÂN CÔNG 
 
 @app.route('/them_phan_cong', methods=['POST'])
+@login_required
 def them_phan_cong():
     employee_id = request.form['employee-id']
     flight_id = request.form['flight-id']
@@ -1318,6 +1363,7 @@ def them_phan_cong():
         return jsonify({"error": f"Lỗi khi thêm phân công: {str(e)}"}), 500
 
 @app.route('/sua_phan_cong', methods=['POST'])
+@login_required
 def sua_phan_cong():
     employee_id = request.form['employee-id']
     new_flight_id = request.form['flight-id']
@@ -1359,6 +1405,7 @@ def sua_phan_cong():
         return jsonify({"error": f"Lỗi khi cập nhật phân công: {str(e)}"}), 500
 
 @app.route('/xoa_phan_cong', methods=['POST'])
+@login_required
 def xoa_phan_cong():
     employee_id = request.form['employee_id']
     flight_id = request.form['flight_id']

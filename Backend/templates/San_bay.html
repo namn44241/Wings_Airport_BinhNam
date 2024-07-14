@@ -400,6 +400,11 @@
                 e.preventDefault();
                 
                 const formData = new FormData(this);
+                
+                // Lấy NgayDi từ GioDi
+                const departureDatetime = new Date(formData.get('departure-datetime'));
+                const ngayDi = departureDatetime.toISOString().split('T')[0]; // Lấy phần yyyy-mm-dd
+                formData.append('ngay_di', ngayDi);
 
                 fetch(`${API_BASE_URL}/them_dat_cho_fe`, {
                     method: 'POST',
@@ -408,7 +413,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert("Đã đặt chỗ và gửi email chứa thông tin đặt chỗ của bạn thành công");
+                        alert(data.message);
                         // Reset form
                         this.reset();
                         document.getElementById('manage-customer-id').value = '';
@@ -421,6 +426,14 @@
                     alert('Có lỗi xảy ra khi gửi yêu cầu: ' + error.message);
                 });
             });
+
+            const lastRegisteredCustomerId = localStorage.getItem('lastRegisteredCustomerId');
+            if (lastRegisteredCustomerId) {
+                document.getElementById('manage-customer-id').value = lastRegisteredCustomerId;
+                // Xóa giá trị từ localStorage sau khi đã sử dụng
+                localStorage.removeItem('lastRegisteredCustomerId');
+            }
+        }
 
         function initializeBooking() {
             const form = document.getElementById('customer-form');
