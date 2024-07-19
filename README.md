@@ -1,5 +1,7 @@
 # 1.1. Tổng quan về sân bay Wings Airport
 
+https://youtu.be/diddub_jWAM?si=4pPiAdezpXkX1kUP
+
 Sân bay quốc tế Wings Airport hướng đến là một sân bay thật sự trong hệ thống giao thông hàng không của Việt Nam. Với số lượng hành khách ngày càng tăng, và các chuyến bay [nội địa/quốc tế] được khai thác thường xuyên, Wings Airport của chúng em ra đời đang phải đối mặt với nhiều thách thức:
 
 - **Đảm bảo an ninh, an toàn:** Hệ thống an ninh, an toàn phải được kiểm soát chặt chẽ và hiệu quả.
