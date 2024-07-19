@@ -1,5 +1,7 @@
 # CÁC NHÁNH TỔNG HỢP Ở MAIN
 
+https://youtu.be/diddub_jWAM?si=4pPiAdezpXkX1kUP
+
 # Thiết kế chi tiết các chức năng
 
 Phần này sẽ đi sâu vào thiết kế chi tiết từng chức năng của hệ thống website quản lý sân bay Wings Airport, bao gồm:
