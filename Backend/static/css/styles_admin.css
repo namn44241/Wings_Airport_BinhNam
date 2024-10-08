@@ -1,4 +1,4 @@
-/* Preloader styles */
+/* Hiệu ứng xoay xoay */
 #preloader {
     position: fixed;
     top: 0;
@@ -32,14 +32,13 @@
 }
 
 .avatar {
-    width: 80%;
+    width: 10%;
     height: 80%;
     border-radius: 50%;
     object-fit: cover;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     animation: pulse 2s ease-in-out infinite;
 }
-/* Trong file CSS */
 
 @keyframes spin {
     0% { transform: rotate(0deg); }

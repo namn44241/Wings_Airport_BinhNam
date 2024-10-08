@@ -27,12 +27,32 @@
     }
 </style>
 <body>
+    <!-- Hiệu ứng xoay xoay -->
     <div id="preloader">
         <div class="spinner">
           <img src="{{ url_for('static', filename='images/wings.png') }}" alt="Avatar" class="avatar">
         </div>
          
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+            document.getElementById('preloader').classList.add('hidden');
+            document.body.classList.add('loaded');
+            }, 3000);
+        });
+        
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+            if (!document.body.classList.contains('loaded')) {
+                document.getElementById('preloader').classList.add('hidden');
+                document.body.classList.add('loaded');
+            }
+            }, 500);
+        });
+    </script>
+
+    <!-- Logo và phần đầu trang -->
     <header>
         <div class="headerdiv">
             <img class="logo" src="{{ url_for('static', filename='images/wings.png') }}" alt="wings">
@@ -53,8 +73,9 @@
             <div class="modal-content">
                 <span class="close">&times;</span>
                 <h2>Lựa chọn Vùng và ngôn ngữ</h2>
+                <!-- Thêm các quốc gia khác -->
                 <div>
-                    <label for="country">Quốc gia/Vùng:</label>
+                    <label for="country">Quốc gia/Vùng:</label>                 
                     <select id="country">
                         <option value="vietnam">VIETNAM</option>
                         <option value="usa">USA</option>
@@ -62,17 +83,15 @@
                         <option value="japan">Laos</option>
                         <option value="japan">Malaysia</option>
                         <option value="japan">Myanmar</option>
-                        <option value="japan">Thailand</option>
-
-                        <!-- Thêm các quốc gia khác -->
+                        <option value="japan">Thailand</option>                   
                     </select>
                 </div>
+                <!-- Thêm các ngôn ngữ khác -->
                 <div>
                     <label for="language">Ngôn ngữ:</label>
                     <select id="language">
                         <option value="tieng-viet">Tiếng Việt</option>
                         <option value="english">-- Chúng tôi đang phát triển thêm các ngôn ngữ khác --</option>
-                        <!-- Thêm các ngôn ngữ khác -->
                     </select>
                 </div>
                 <button id="applyChoice">LỰA CHỌN</button>
@@ -154,9 +173,7 @@
         </div>
         <div class="dots"></div>
     </div>
-    
-    
-    <!--  4 hình ảnh -->
+
     <script>
         let slideIndex = 0;
         let slides = document.querySelectorAll(".slide1");
@@ -172,8 +189,6 @@
                 slideIndex = slides.length - 1;
             }
             slideWrapper.style.transform = `translateX(-${slideIndex * 100}%)`;
-    
-            // Update active dot
             let dots = dotsContainer.querySelectorAll(".dot");
             dots.forEach((dot, index) => {
                 dot.classList.toggle("active", index === slideIndex);
@@ -197,14 +212,15 @@
         showSlides(0);
         setInterval(nextSlide, 5000);
     </script>
-  <!-- New Small Box Section -->
- 
+
+    <!-- Đăng ký khách hàng, đặt chỗ, tra cứu -->
     <div class="navbar">
         <div id="nav-booking" onclick="showContainer('booking')">ĐĂNG KÝ KHÁCH HÀNG</div>
         <div id="nav-manage" onclick="showContainer('manage')">ĐẶT CHỖ</div>
         <div id="nav-checkin" onclick="showContainer('checkin')">TRA CỨU CHUYẾN BAY, LỊCH BAY</div>
     </div>
     <div class="overlay1" id="overlay1"></div>
+
     <!-- Đăng ký khách hàng -->
     <div class="container" id="booking-container" style="display: none;">
         <form id="customer-form">
@@ -233,7 +249,6 @@
     </div>
 
     <!-- ĐẶT CHỖ -->
-
     <div class="container" id="manage-container" style="display: none;">
         <form id="bookingForm" action="{{ url_for('them_dat_cho_fe') }}" method="POST">
             <div class="form-row">
@@ -270,7 +285,6 @@
     </div>
 
     <!-- TRA CỨU CHUYẾN BAY, LỊCH BAY -->
-
     <div class="container" id="checkin-container" style="display: none;">
         <form id="search-flight-form">
             <p>Tìm kiếm mã chuyến bay:</p>
@@ -305,9 +319,7 @@
     </div>
 
     <script>
-
     const API_BASE_URL = 'http://127.0.0.1:5000';
-
 
     document.addEventListener('DOMContentLoaded', function() {
         const bookingContainer = document.getElementById('booking-container');
@@ -558,7 +570,6 @@
     });
     </script>
 
-
     <script>
         function showContainer(containerId) {
             var containers = document.querySelectorAll('.container');
@@ -620,10 +631,11 @@
             </div>
         </div>
     </div>
-    <!-- Notification Bar -->
+
+    <!-- Thanh thông báo -->
     <div class="notification-bar">
         <div class="notification-content" id="notification-content">
-            <!-- Initial notification content will be set by JavaScript -->
+            <!-- Nội dung thông báo ban đầu sẽ được thiết lập bằng JavaScript -->
         </div>
         <div class="notification-nav">
             <button onclick="prevNotification()">&#9664;</button>
@@ -689,8 +701,10 @@
             });
         });
     </script>
+
     <hr style="height: 0.7px; background-color: rgb(0, 0, 0);">
 
+    <!-- Khám phá các chuyến bay phổ biến -->
     <h2 class="khampha">Khám Phá Các Chuyến Bay Phổ Biến Nhất Của Chúng Tôi</h2>
     <div style="margin-left: 10.5%;">
         <div class="dropdown">
@@ -729,14 +743,12 @@
             { from: "Huế", to: "Hà Nội", image: "{{ url_for('static', filename='images/hanoi1.jpg') }}", link: "https://www.pexels.com/vi-vn/tim-kiem/h%C3%A0%20n%E1%BB%99i/", price: "1,500,000 VND" },
             { from: "Hà Nội", to: "Quảng Bình", image: "{{ url_for('static', filename='images/dong-phong-nha.jpg') }}", link: "https://top10quangbinh.vn/hinh-anh-quang-binh/", price: "1,300,000 VND" },
             { from: "Đà Lạt", to: "TP Hồ Chí Minh", image: "{{ url_for('static', filename='images/hcm.jpg') }}", link: "https://www.pexels.com/vi-vn/tim-kiem/th%C3%A0nh%20ph%E1%BB%91%20h%E1%BB%93%20ch%C3%AD%20minh/", price: "900,000 VND" }
-        ];
-        
+        ];        
         let showAllImages = false;
-        
+
         function populateDropdown() {
             const dropdown = document.getElementById('dropdownContent1');
-            const uniqueRoutes = [...new Set(flightRoutes.map(route => `${route.from} đến ${route.to}`))];
-            
+            const uniqueRoutes = [...new Set(flightRoutes.map(route => `${route.from} đến ${route.to}`))];           
             uniqueRoutes.forEach(route => {
                 const a = document.createElement('a');
                 a.href = '#';
@@ -755,8 +767,7 @@
             
             const filteredRoutes = flightRoutes.filter(route => `${route.from} đến ${route.to}` === selectedRoute);
             displayImages(filteredRoutes);
-        }
-        
+        }        
         function displayImages(routes) {
         const rows = [document.getElementById('row1'), document.getElementById('row2'), document.getElementById('row3')];
         rows.forEach(row => {
@@ -843,6 +854,7 @@
 
     <br><div class="dropdown-note" style="text-align: center; font-size: 11px;">*Giá vé hiển thị được thu thập trong vòng 48 giờ và có thể không còn hiệu lực tại thời điểm đặt chỗ. Chúng tôi có thể thu thêm phí và lệ phí cho một số sản phẩm và dịch vụ.</div>
 
+    <!-- Thông tin nổi bật -->
     <div class="section-title">
         <span>Thông tin nổi bật</span>
     </div>
@@ -907,7 +919,7 @@
         let currentSlide = 0;
         const slidesPerPage = 3;
     
-        // Create dots dynamically
+        // Tạo dấu chấm động
         const numDots = Math.ceil(slides1.length / slidesPerPage);
         for (let i = 0; i < numDots; i++) {
             const dot = document.createElement('span');
@@ -919,14 +931,12 @@
         }
     
         const dots1 = document.querySelectorAll('.dot');
-    
+        // // Hàm hiển thị slide dựa trên chỉ số n (số thứ tự của dấu chấm)
         function showSlide(n) {
             currentSlide = n;
-            const slideWidth = slides1[0].offsetWidth + 20; // Including margin
+            const slideWidth = slides1[0].offsetWidth + 20; 
             const maxTranslate = -(Math.floor((slides1.length - 1) / slidesPerPage) * slidesPerPage * slideWidth);
             let translateX = -n * slidesPerPage * slideWidth;
-            
-            // Ensure we don't translate beyond the last set of slides
             translateX = Math.max(maxTranslate, Math.min(0, translateX));
             
             slider.style.transform = `translateX(${translateX}px)`;
@@ -935,7 +945,8 @@
                 dot.classList.toggle('active', index === n);
             });
         }
-    
+
+        // Hàm chuyển sang slide tiếp theo (khi hết slide sẽ quay lại slide đầu tiên)
         function nextSlide() {
             currentSlide = (currentSlide + 1) % numDots;
             showSlide(currentSlide);
@@ -949,13 +960,13 @@
             dot.addEventListener('click', () => {
                 clearInterval(slideInterval);
                 showSlide(index);
-                slideInterval = setInterval(nextSlide, 5000); // Restart interval
+                slideInterval = setInterval(nextSlide, 5000); 
             });
         });
     </script>
         
         <!-- xoay xoay -->
-    <script>
+    <!-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
             document.getElementById('preloader').classList.add('hidden');
@@ -971,7 +982,7 @@
             }
             }, 500);
         });
-    </script>
+    </script> -->
       
     <div class="section-title">
         <span>Đăng ký E-Newsletter</span>
@@ -1048,13 +1059,13 @@
             }
         });
     
-        // Xử lý việc gửi form
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             sendEmail();
         });
     });
-    
+
+    // Xử lý việc gửi form
     function sendEmail() {
         var email = document.getElementById('email').value;
         var language = document.getElementById('language').value;
@@ -1090,7 +1101,8 @@
         });
     }
     </script>
-
+    
+    <!-- Chân trang -->
     <div  class="header1">
         <img src="{{ url_for('static', filename='images/Remove-bg.ai_1719194895104.png') }}" alt="header1">
         <span>
