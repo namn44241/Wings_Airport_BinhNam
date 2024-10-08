@@ -55,3 +55,77 @@ Do hạn chế về mặt thời gian, nguồn lực và kiến thức, dự c�
 - Dữ liệu được sử dụng trong quá trình xây dựng và demo hệ thống là dữ liệu mô phỏng.
 
 Mặc dù còn nhiều hạn chế, nhưng chúng em đã cố gắng hết sức để hoàn thành tốt nhất các mục tiêu đề ra, đồng thời đảm bảo tính thực tiễn và khả năng ứng dụng của đề tài.
+
+
+# 1.5. Hướng dẫn sử dụng
+
+## 1.5.1. Cài đặt SSMS, DSN, Postman, Python
+
+Tìm kiếm Google, đảm bảo chạy đầy đủ trước khi làm các bước tiếp
+
+## 1.5.2. Cài đặt CSDL
+
+### Bước 1:
+Chạy Sql Sever Configuration Manager
+Nhấn "SQL Sever Services"
+Kiểm tra xem 2 dòng đầu đang Running hay Stopped, Stopped thì chuột phải ấn Run
+
+![alt text](image-3.png)
+
+### Bước 2:
+Chạy SSMS
+Connect sever: 
+- Sever name: Localhost
+- Authen: Giữ nguyên
+- Tick vào "Trust sever.."
+Ấn Connect:
+
+![alt text](image-4.png)
+
+### Bước 3:
+Nhấn "New Query"
+Trong Main \ Query SQL \ Dán lần lượt QuanLiSanBay.sql ; insert... 
+Cho chạy từng dòng, khéo không lỗi
+
+## 1.5.3. Cài đặt DSN
+
+### Bước 1:
+Tìm ODBC Data Source 32/64bit -> System DSN -> Add -> ODBC Driver .. for SQL Sever 
+
+Name: Đặt tên
+Des..: Bỏ qua
+Sever: localhost
+
+![alt text](image.png)
+
+### Bước 2:
+Next -> Next
+Tick ô "Change the default.."
+Mũi tên xuống
+Chọn QuanLiSanBay
+
+![alt text](image-1.png)
+
+### Bước 3:
+Next -> Next
+Test Data Source...
+Test Complete succ.. là xong
+
+![alt text](image-2.png)
+
+Bấm Finish
+
+## 1.5.4. Chạy Project
+
+### Bước 1.
+- Mở dự án trong IDE, ví dụ VSCode
+- Bật terminal
+- Chạy ``` qlsb_venv\Scripts\activate ``` 
+- Chạy ``` cd Main ```
+- Chạy ``` python app.py ``` và truy cập theo địa chỉ ```localhost:5000``` hoặc ```127.0.0.1:5000``` hoặc ```{ip_của_mày}:5000``` để chạy
+
+![alt text](image-5.png)
+
+---
+
+![alt text](image-6.png)
