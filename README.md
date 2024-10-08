@@ -80,12 +80,12 @@ Connect sever:
 - Tick vào "Trust sever.."
 Ấn Connect:
 
-![alt text](image-4.png)
-
 ### Bước 3:
 Nhấn "New Query"
 Trong Main \ Query SQL \ Dán lần lượt QuanLiSanBay.sql ; insert... 
 Cho chạy từng dòng, khéo không lỗi
+
+![alt text](image-4.png)
 
 ## 1.5.3. Cài đặt DSN
 
@@ -121,7 +121,8 @@ Bấm Finish
 - Mở dự án trong IDE, ví dụ VSCode
 - Bật terminal
 - Chạy ``` qlsb_venv\Scripts\activate ``` 
-- Chạy ``` cd Main ```
+- Chạy ``` cd main ```
+- Chạy ``` pip install -r requirements.txt ```
 - Chạy ``` python app.py ``` và truy cập theo địa chỉ ```localhost:5000``` hoặc ```127.0.0.1:5000``` hoặc ```{ip_của_mày}:5000``` để chạy
 
 ![alt text](image-5.png)
