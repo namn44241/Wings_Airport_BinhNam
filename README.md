@@ -70,7 +70,7 @@ Chạy Sql Sever Configuration Manager
 Nhấn "SQL Sever Services"
 Kiểm tra xem 2 dòng đầu đang Running hay Stopped, Stopped thì chuột phải ấn Run
 
-![alt text](image-3.png)
+![image-1.png](./main/static/images/readme/image-3.png)
 
 ### Bước 2:
 Chạy SSMS
@@ -85,7 +85,7 @@ Nhấn "New Query"
 Trong Main \ Query SQL \ Dán lần lượt QuanLiSanBay.sql ; insert... 
 Cho chạy từng dòng, khéo không lỗi
 
-![alt text](image-4.png)
+![image-1.png](./main/static/images/readme/image-4.png)
 
 ## 1.5.3. Cài đặt DSN
 
@@ -96,7 +96,7 @@ Name: Đặt tên
 Des..: Bỏ qua
 Sever: localhost
 
-![alt text](image.png)
+![image-1.png](./main/static/images/readme/image.png)
 
 ### Bước 2:
 Next -> Next
@@ -104,14 +104,14 @@ Tick ô "Change the default.."
 Mũi tên xuống
 Chọn QuanLiSanBay
 
-![alt text](image-1.png)
+![image-1.png](./main/static/images/readme/image-1.png)
 
 ### Bước 3:
 Next -> Next
 Test Data Source...
 Test Complete succ.. là xong
 
-![alt text](image-2.png)
+![image-1.png](./main/static/images/readme/image-2.png)
 
 Bấm Finish
 
@@ -125,8 +125,8 @@ Bấm Finish
 - Chạy ``` pip install -r requirements.txt ```
 - Chạy ``` python app.py ``` và truy cập theo địa chỉ ```localhost:5000``` hoặc ```127.0.0.1:5000``` hoặc ```{ip_của_mày}:5000``` để chạy
 
-![alt text](image-5.png)
+![image-1.png](./main/static/images/readme/image-5.png)
 
 ---
 
-![alt text](image-6.png)
+![image-1.png](./main/static/images/readme/image-6.png)

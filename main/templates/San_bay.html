@@ -34,23 +34,7 @@
         </div>
          
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-            document.getElementById('preloader').classList.add('hidden');
-            document.body.classList.add('loaded');
-            }, 3000);
-        });
-        
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-            if (!document.body.classList.contains('loaded')) {
-                document.getElementById('preloader').classList.add('hidden');
-                document.body.classList.add('loaded');
-            }
-            }, 500);
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/san-bay/dom-preload.js') }}"></script>
 
     <!-- Logo và phần đầu trang -->
     <header>
@@ -91,61 +75,14 @@
                     <label for="language">Ngôn ngữ:</label>
                     <select id="language">
                         <option value="tieng-viet">Tiếng Việt</option>
-                        <option value="english">-- Chúng tôi đang phát triển thêm các ngôn ngữ khác --</option>
+                        <option value="english">Tiếng Anh</option>
                     </select>
                 </div>
                 <button id="applyChoice">LỰA CHỌN</button>
             </div>
         </div>
     </header>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var modal = document.getElementById("languageModal");
-            var btn = document.getElementById("languageSelector");
-            var span = document.getElementsByClassName("close")[0];
-            var applyBtn = document.getElementById("applyChoice");
-
-            btn.onclick = function(e) {
-                e.preventDefault();
-                modal.style.display = "block";
-            }
-
-            span.onclick = function() {
-                modal.style.display = "none";
-            }
-
-            window.onclick = function(event) {
-                if (event.target == modal) {
-                    modal.style.display = "none";
-                }
-            }
-
-            applyBtn.onclick = function() {
-                var country = document.getElementById("country");
-                var language = document.getElementById("language");
-                var displayText = country.options[country.selectedIndex].text + " - " + 
-                                language.options[language.selectedIndex].text;
-                btn.textContent = displayText;
-                modal.style.display = "none";
-            }
-
-            document.getElementById("helpLink").onclick = function(event) {
-                event.preventDefault();
-                alert("Chào mừng bạn đến với Sân bay Trực tuyến!\n\n### Giới thiệu\nSân bay Trực tuyến là nền tảng giúp bạn quản lý và đặt vé máy bay một cách dễ dàng và thuận tiện. Hãy khám phá các tính năng và dịch vụ mà chúng tôi cung cấp để có một trải nghiệm đi bay tuyệt vời!\n\n### Các tính năng chính\n- Đặt chỗ và quản lý chuyến bay của bạn.\n- Xem thông tin chi tiết về lịch trình chuyến bay và sân bay.\n- Hỗ trợ trực tuyến để giải đáp mọi thắc mắc của bạn.\n- Thông tin chi tiết về các dịch vụ và tiện ích tại sân bay.\n\n### Các câu hỏi thường gặp (FAQ)\n**Làm thế nào để đặt vé máy bay?**\nĐể đặt vé máy bay trên Sân bay Trực tuyến, bạn có thể truy cập vào phần đặt chỗ và làm theo các bước hướng dẫn trên màn hình.\n\n**Tôi có thể thay đổi lịch trình chuyến bay như thế nào?**\nBạn có thể thay đổi lịch trình chuyến bay bằng cách truy cập vào phần quản lý chuyến bay và chọn chức năng sửa đổi lịch trình.\n\n### Liên hệ và Hỗ trợ\nNếu bạn cần thêm thông tin hoặc hỗ trợ, vui lòng liên hệ với chúng tôi qua email support@sanbaytructuyen.com hoặc gọi số hotline: 0123 456 789");
-            }
-
-
-            function showContainer(containerId) {
-                document.querySelectorAll('.container').forEach(container => {
-                    container.style.display = 'none';
-                });
-                if (containerId === 'booking') {
-                    document.getElementById('booking-container').style.display = 'block';
-                }
-            }
-        });
-        
-    </script>
+    <script src="{{ url_for('static', filename='js/san-bay/menu-helplink-language.js') }}"></script>
 
     <!-- <h2 class="w3-center">Trình Chiếu Hình Ảnh</h2> -->
     <div class="slide1-container">
@@ -173,45 +110,7 @@
         </div>
         <div class="dots"></div>
     </div>
-
-    <script>
-        let slideIndex = 0;
-        let slides = document.querySelectorAll(".slide1");
-        let slideWrapper = document.querySelector(".slide1-wrapper");
-        let dotsContainer = document.querySelector(".dots");
-    
-        function showSlides(n) {
-            slideIndex = n;
-            if (slideIndex > slides.length - 1) {
-                slideIndex = 0;
-            }
-            if (slideIndex < 0) {
-                slideIndex = slides.length - 1;
-            }
-            slideWrapper.style.transform = `translateX(-${slideIndex * 100}%)`;
-            let dots = dotsContainer.querySelectorAll(".dot");
-            dots.forEach((dot, index) => {
-                dot.classList.toggle("active", index === slideIndex);
-            });
-        }
-    
-        function createDots() {
-            for (let i = 0; i < slides.length; i++) {
-                let dot = document.createElement("span");
-                dot.classList.add("dot");
-                dot.addEventListener("click", () => showSlides(i));
-                dotsContainer.appendChild(dot);
-            }
-        }
-    
-        function nextSlide() {
-            showSlides(slideIndex + 1);
-        }
-    
-        createDots();
-        showSlides(0);
-        setInterval(nextSlide, 5000);
-    </script>
+    <script src="{{ url_for('static', filename='js/san-bay/slide-anhto.js') }}"></script>
 
     <!-- Đăng ký khách hàng, đặt chỗ, tra cứu -->
     <div class="navbar">
@@ -318,291 +217,9 @@
         </div>
     </div>
 
-    <script>
-    const API_BASE_URL = 'http://127.0.0.1:5000';
+    <script src="{{ url_for('static', filename='js/san-bay/fe-link-be.js') }}"></script>
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const bookingContainer = document.getElementById('booking-container');
-        const manageContainer = document.getElementById('manage-container');
-        const checkinContainer = document.getElementById('checkin-container');
-
-        // Thêm event listeners cho navbar
-        document.getElementById('nav-booking').addEventListener('click', () => showContainer('booking'));
-        document.getElementById('nav-manage').addEventListener('click', () => showContainer('manage'));
-        document.getElementById('nav-checkin').addEventListener('click', () => showContainer('checkin'));
-
-        function showContainer(containerName) {
-            bookingContainer.style.display = 'none';
-            manageContainer.style.display = 'none';
-            checkinContainer.style.display = 'none';
-
-            switch(containerName) {
-                case 'booking':
-                    bookingContainer.style.display = 'block';
-                    initializeBooking();
-                    break;
-                case 'manage':
-                    manageContainer.style.display = 'block';
-                    initializeManage();
-                    break;
-                case 'checkin':
-                    checkinContainer.style.display = 'block';
-                    initializeCheckin();
-                    break;
-            }
-        }
-
-        function initializeManage() {
-            // Xóa các option cũ (nếu có)
-            const flightSelect = document.getElementById('manage-flight-id');
-            flightSelect.innerHTML = '<option value="">-- Chọn Mã chuyến bay --</option>';
-
-            // Lấy danh sách chuyến bay chỉ khi người dùng focus vào select
-            flightSelect.addEventListener('focus', function() {
-                if (this.options.length <= 1) {  // Chỉ tải nếu chưa có dữ liệu
-                    fetch(`${API_BASE_URL}/api/flights`)
-                        .then(response => response.json())
-                        .then(data => {
-                            data.forEach(flight => {
-                                const option = document.createElement('option');
-                                option.value = flight.MaChuyenBay;
-                                option.textContent = `${flight.MaChuyenBay} - ${flight.TenSanBayDi} - ${flight.TenSanBayDen}`;
-                                flightSelect.appendChild(option);
-                            });
-                        })
-                        .catch(error => console.error('Error:', error));
-                }
-            });
-
-            // Chỉ cập nhật thông tin chuyến bay khi đã chọn Mã chuyến bay
-            flightSelect.addEventListener('change', function() {
-                if (this.value) {
-                    updateFlightDetails(this.value);
-                } else {
-                    document.getElementById('manage-departure-datetime').value = '';
-                    document.getElementById('manage-arrival-datetime').value = '';
-                }
-            });
-
-            // Hàm cập nhật thông tin chuyến bay
-            function updateFlightDetails(flightId) {
-                if (flightId) {
-                    fetch(`${API_BASE_URL}/get_flight_details?flight_id=${flightId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.error) {
-                                alert(data.error);
-                            } else {
-                                document.getElementById('manage-departure-datetime').value = data.departure_time;
-                                document.getElementById('manage-arrival-datetime').value = data.arrival_time;
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Có lỗi khi lấy thông tin chuyến bay');
-                        });
-                } else {
-                    document.getElementById('manage-departure-datetime').value = '';
-                    document.getElementById('manage-arrival-datetime').value = '';
-                }
-            }
-
-            // Xử lý sự kiện submit form đặt chỗ
-            document.getElementById('bookingForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const formData = new FormData(this);
-                
-                // Lấy NgayDi từ GioDi
-                const departureDatetime = new Date(formData.get('departure-datetime'));
-                const ngayDi = departureDatetime.toISOString().split('T')[0]; // Lấy phần yyyy-mm-dd
-                formData.append('ngay_di', ngayDi);
-
-                fetch(`${API_BASE_URL}/them_dat_cho_fe`, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        // Reset form
-                        this.reset();
-                        document.getElementById('manage-customer-id').value = '';
-                    } else {
-                        alert(data.error || 'Có lỗi xảy ra khi đặt chỗ');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi gửi yêu cầu: ' + error.message);
-                });
-            });
-
-            const lastRegisteredCustomerId = localStorage.getItem('lastRegisteredCustomerId');
-            if (lastRegisteredCustomerId) {
-                document.getElementById('manage-customer-id').value = lastRegisteredCustomerId;
-                // Xóa giá trị từ localStorage sau khi đã sử dụng
-                localStorage.removeItem('lastRegisteredCustomerId');
-            }
-        }
-
-        function initializeBooking() {
-            const form = document.getElementById('customer-form');
-
-            fetchNextCustomerId();
-
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                fetch(`${API_BASE_URL}/them_kh_fe`, {
-                    method: 'POST',
-                    body: new FormData(this)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        const customerId = document.getElementById('customer-id').value;
-                        // Lưu Mã khách hàng vào localStorage
-                        localStorage.setItem('lastRegisteredCustomerId', customerId);
-                        showContainer('manage');
-                    } else {
-                        alert('Có lỗi xảy ra: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi gửi yêu cầu');
-                });
-            });
-        }
-
-        function fetchNextCustomerId() {
-            fetch(`${API_BASE_URL}/next_customer_id`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('customer-id').value = data.next_customer_id;
-                })
-                .catch(error => console.error('Error:', error));
-        }
-
-        // function initializeManage() {
-        //     document.getElementById('book-flight').addEventListener('click', bookFlight);
-        // }
-
-        function initializeCheckin() {
-            const tableBody = document.querySelector('#flight-table tbody');
-            
-            tableBody.innerHTML = '<tr><td colspan="7">Đang tải dữ liệu...</td></tr>';
-
-            fetch(`${API_BASE_URL}/api/flights`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    displayFlights(data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    tableBody.innerHTML = '<tr><td colspan="7">Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.</td></tr>';
-                });
-
-            document.getElementById('search-flight-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const query = this.querySelector('input[name="query"]').value;
-                performSearch('flight', query);
-            });
-
-            document.getElementById('search-airport-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const query = this.querySelector('input[name="query"]').value;
-                performSearch('airport', query);
-            });
-        }
-
-        function performSearch(type, query) {
-            const tableBody = document.querySelector('#flight-table tbody');
-            const rows = tableBody.querySelectorAll('tr');
-            
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                if (type === 'flight') {
-                    const flightCode = cells[0].textContent;
-                    row.style.display = flightCode.toLowerCase().includes(query.toLowerCase()) ? '' : 'none';
-                } else if (type === 'airport') {
-                    const departureAirport = cells[3].textContent;
-                    const arrivalAirport = cells[4].textContent;
-                    row.style.display = 
-                        departureAirport.toLowerCase().includes(query.toLowerCase()) ||
-                        arrivalAirport.toLowerCase().includes(query.toLowerCase()) ? '' : 'none';
-                }
-            });
-        }
-
-        function displayFlights(flights) {
-            const tableBody = document.querySelector('#flight-table tbody');
-            tableBody.innerHTML = ''; // Xóa nội dung cũ
-            
-            if (flights.length === 0) {
-                const row = document.createElement('tr');
-                row.innerHTML = '<td colspan="7">Không có dữ liệu</td>';
-                tableBody.appendChild(row);
-            } else {
-                flights.forEach(flight => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${flight.MaChuyenBay || 'N/A'}</td>
-                        <td>${flight.SoHieuMayBay || 'N/A'}</td>
-                        <td>${flight.MaLoaiMayBay || 'N/A'}</td>
-                        <td>${flight.TenSanBayDi || 'N/A'}</td>
-                        <td>${flight.TenSanBayDen || 'N/A'}</td>
-                        <td>${flight.GioDi || 'N/A'}</td>
-                        <td>${flight.GioDen || 'N/A'}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            }
-        }
-    });
-    </script>
-
-    <script>
-        function showContainer(containerId) {
-            var containers = document.querySelectorAll('.container');
-            var clickedContainer = document.getElementById(containerId + '-container');
-            var overlay = document.getElementById('overlay1');
-        
-            // Ẩn tất cả các container ngay lập tức
-            containers.forEach(function(container) {
-                container.style.opacity = '0';
-                container.style.display = 'none';
-            });
-        
-            // Hiển thị overlay và container được chọn
-            overlay.style.display = 'block';
-            clickedContainer.style.display = 'block';
-            
-            // Đặt opacity thành 1 sau một khoảng thời gian ngắn để kích hoạt transition
-            setTimeout(function() {
-                clickedContainer.style.opacity = '1';
-            }, 10);
-        }
-        
-        // Đóng popup khi click bên ngoài
-        document.getElementById('overlay1').addEventListener('click', function() {
-            var containers = document.querySelectorAll('.container');
-            containers.forEach(function(container) {
-                // Ẩn ngay lập tức, không có hiệu ứng fade out
-                container.style.display = 'none';
-                container.style.opacity = '0';
-            });
-            this.style.display = 'none';
-        });
-        </script><br><br>
+    <script src="{{ url_for('static', filename='js/san-bay/an-khi-tat.js') }}"></script>
     <div class="services-container">
         <div class="horizontal">
             <div class="item">
@@ -646,61 +263,8 @@
             <a href="https://www.vietnamairlines.com/vn/vi/vietnam-airlines/press-room/news" id="notification-more-link">Xem thêm</a>
         </div>
     </div>
-    
-    <script>
-        const notifications = [
-            { type: 'Tin tức', date: '10/06/2024', text: 'Thông báo quầy làm thủ tục từ Philippines về Việt Nam', link: 'https://example.com/news1' },
-            { type: 'Tin tức', date: '11/06/2024', text: 'Chuyến bay mới từ Hà Nội đi Đà Nẵng', link: 'https://example.com/news2' },
-            { type: 'Tin tức', date: '12/06/2024', text: 'Giảm giá vé máy bay mùa hè', link: 'https://example.com/news3' },
-            { type: 'Tin tức', date: '13/06/2024', text: 'Lịch bay mùa đông', link: 'https://example.com/news4' }
-        ];
-        let currentNotificationIndex = 0;
-        let intervalId;
-    
-        function updateNotification() {
-            const content = document.getElementById('notification-content');
-            const count = document.getElementById('notification-count');
-            const moreLink = document.getElementById('notification-more-link');
-            const currentNotification = notifications[currentNotificationIndex];
-    
-            content.innerHTML = `
-                <span class="notification-type">${currentNotification.type}</span>: 
-                <span>${currentNotification.date}</span> - 
-                <a href="${currentNotification.link}" style="text-decoration: none; color: inherit;">
-                    ${currentNotification.text}
-                </a>`;
-            count.innerText = `${currentNotificationIndex + 1}/${notifications.length}`;
-            moreLink.href = currentNotification.link;
-        }
-    
-        function prevNotification() {
-            currentNotificationIndex = (currentNotificationIndex - 1 + notifications.length) % notifications.length;
-            updateNotification();
-        }
-    
-        function nextNotification() {
-            currentNotificationIndex = (currentNotificationIndex + 1) % notifications.length;
-            updateNotification();
-        }
-    
-        function startAutoSlide() {
-            intervalId = setInterval(nextNotification, 5000);
-        }
-    
-        function stopAutoSlide() {
-            clearInterval(intervalId);
-        }
-    
-        document.addEventListener('DOMContentLoaded', () => {
-            updateNotification();
-            startAutoSlide();
-    
-            const buttons = document.querySelectorAll('.notification-nav button');
-            buttons.forEach(button => {
-                button.addEventListener('click', stopAutoSlide);
-            });
-        });
-    </script>
+
+    <script src="{{ url_for('static', filename='js/san-bay/tin-tuc.js') }}"></script>
 
     <hr style="height: 0.7px; background-color: rgb(0, 0, 0);">
 
@@ -911,78 +475,10 @@
         transform: scale(1.05);
     }
     </style>
-    
-    <script>
-        const slides1 = document.querySelectorAll('.slide');
-        const slider = document.querySelector('.slider');
-        const dotsContainer1 = document.querySelector('.dots1');
-        let currentSlide = 0;
-        const slidesPerPage = 3;
-    
-        // Tạo dấu chấm động
-        const numDots = Math.ceil(slides1.length / slidesPerPage);
-        for (let i = 0; i < numDots; i++) {
-            const dot = document.createElement('span');
-            dot.classList.add('dot');
-            if (i === 0) {
-                dot.classList.add('active');
-            }
-            dotsContainer1.appendChild(dot);
-        }
-    
-        const dots1 = document.querySelectorAll('.dot');
-        // // Hàm hiển thị slide dựa trên chỉ số n (số thứ tự của dấu chấm)
-        function showSlide(n) {
-            currentSlide = n;
-            const slideWidth = slides1[0].offsetWidth + 20; 
-            const maxTranslate = -(Math.floor((slides1.length - 1) / slidesPerPage) * slidesPerPage * slideWidth);
-            let translateX = -n * slidesPerPage * slideWidth;
-            translateX = Math.max(maxTranslate, Math.min(0, translateX));
-            
-            slider.style.transform = `translateX(${translateX}px)`;
-            
-            dots1.forEach((dot, index) => {
-                dot.classList.toggle('active', index === n);
-            });
-        }
 
-        // Hàm chuyển sang slide tiếp theo (khi hết slide sẽ quay lại slide đầu tiên)
-        function nextSlide() {
-            currentSlide = (currentSlide + 1) % numDots;
-            showSlide(currentSlide);
-        }
-    
-        showSlide(currentSlide);
-    
-        let slideInterval = setInterval(nextSlide, 5000);
-    
-        dots1.forEach((dot, index) => {
-            dot.addEventListener('click', () => {
-                clearInterval(slideInterval);
-                showSlide(index);
-                slideInterval = setInterval(nextSlide, 5000); 
-            });
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/san-bay/slide-kham-pha.js') }}"></script>
         
-        <!-- xoay xoay -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-            document.getElementById('preloader').classList.add('hidden');
-            document.body.classList.add('loaded');
-            }, 3000);
-        });
-        
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-            if (!document.body.classList.contains('loaded')) {
-                document.getElementById('preloader').classList.add('hidden');
-                document.body.classList.add('loaded');
-            }
-            }, 500);
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/san-bay/dom-xoay.js') }}"></script>
       
     <div class="section-title">
         <span>Đăng ký E-Newsletter</span>
@@ -1042,65 +538,7 @@
         </form>
     </div><br>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-        var emailInput = document.getElementById('email');
-        var additionalFields = document.getElementById('additional-fields');
-        var form = document.getElementById('newsletter-form');
-    
-        // Xử lý hiển thị/ẩn các trường bổ sung
-        emailInput.addEventListener('focus', function() {
-            additionalFields.style.display = 'block';
-        });
-    
-        document.addEventListener('click', function(event) {
-            if (!emailInput.contains(event.target) && !additionalFields.contains(event.target)) {
-                additionalFields.style.display = 'none';
-            }
-        });
-    
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            sendEmail();
-        });
-    });
-
-    // Xử lý việc gửi form
-    function sendEmail() {
-        var email = document.getElementById('email').value;
-        var language = document.getElementById('language').value;
-        var lastName = document.getElementById('last_name').value;
-        var firstName = document.getElementById('first_name').value;
-        var fullName = lastName + ' ' + firstName;
-
-        console.log("Selected language:", language);
-        
-        fetch('http://127.0.0.1:5000/send-email', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: email,
-                language: language, 
-                fullName: fullName
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Đăng ký thành công! Email xác nhận đã được gửi.');
-                document.getElementById('newsletter-form').reset();
-            } else {
-                alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
-        });
-    }
-    </script>
+    <script src="{{ url_for('static', filename='js/san-bay/send-mail.js') }}"></script>
     <!-- Chân trang -->
     <div  class="header1">
         <img src="{{ url_for('static', filename='images/Remove-bg.ai_1719194895104.png') }}" alt="header1">
@@ -1152,11 +590,8 @@
                 <a href="#" onclick="showAlert('Thông tin quảng cáo với Wings Airports')">Quảng Cáo Với Wings Airports</a>
             </div>
         </div>
-        <script>
-            function showAlert(message) {
-                alert(message);
-            }
-        </script>
+        
+        <script src="{{ url_for('static', filename='js/san-bay/alert-noti.js') }}"></script>
           
         <div class="footer-container">
             <div class="footer-column">
@@ -1211,5 +646,6 @@
             <img src="{{ url_for('static', filename='images/PCI_DSS_CERTIFIED-38.webp') }}" alt="Image 3"  width="80px">            
         </div>
     </footer>
+    <script src="{{ url_for('static', filename='js/san-bay/language-switch.js') }}"></script>
 </body>
 </html>

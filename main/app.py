@@ -16,6 +16,8 @@ dsn = 'QuanLiSanBay'
 cnxn = pyodbc.connect(f'DSN={dsn}')
 cursor = cnxn.cursor()
 
+# 1. Kiểm tra kết nối và đăng nhập
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -114,6 +116,8 @@ def auth():
 def logout():
     session.pop('username', None)
     return redirect(url_for('san_bay'))
+
+# 2. Quản lý sân bay và admin
 
 @app.route('/san_bay')
 def san_bay():
@@ -366,6 +370,8 @@ app.config['MAIL_PASSWORD'] = 'hhma ernj xofx geks'
 
 mail = Mail(app)
 
+# 3. Gửi email
+
 @app.route('/send-email', methods=['POST'])
 def send_email():
     data = request.json
@@ -430,7 +436,9 @@ def send_email():
     except Exception as e:
         print(f"Error sending email: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
-    
+
+# 4. Quản lý chuyến bay
+
 @app.route('/api/flights', methods=['GET'])
 def get_flights():
     try:
@@ -508,6 +516,21 @@ def book_flight():
         print(f"Error: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
 
+@app.route('/get_flight_details', methods=['GET'])
+def get_flight_details():
+    flight_id = request.args.get('flight_id')
+    query = "SELECT GioDi, GioDen FROM ChuyenBay WHERE MaChuyenBay = ?"
+    cursor.execute(query, (flight_id,))
+    result = cursor.fetchone()
+    if result:
+        return jsonify({
+            'departure_time': result.GioDi.isoformat(),
+            'arrival_time': result.GioDen.isoformat()
+        })
+    return jsonify({'error': 'Không tìm thấy chuyến bay'}), 404
+
+# 5. Quản lý chuyến bay (admin)
+
 @app.route('/them_cb', methods=['POST'])
 @login_required
 def them_cb():
@@ -583,7 +606,7 @@ def xoa_cb(flight_id):
         cnxn.rollback()
         return jsonify({"status": "error", "message": f"Có lỗi xảy ra: {str(e)}"})
 
-### Các hàm xử lý cho quản lý LOẠI MÁY BAY
+# 6. Quản lý loại máy bay
 
 @app.route('/them_loai_mb', methods=['POST'])
 @login_required
@@ -642,8 +665,7 @@ def xoa_loai_mb(plane_type_id):
         cnxn.rollback()
         return jsonify({"status": "error", "message": f"Có lỗi xảy ra: {str(e)}"})
 
-
-### Các hàm xử lý cho quản lý ĐẶT CHỖ
+# 7. Quản lý đặt chỗ
 
 @app.route('/them_dat_cho', methods=['POST'])
 @login_required
@@ -884,19 +906,6 @@ def them_dat_cho_fe():
         return jsonify({"error": f"Lỗi không xác định: {error_message}"}), 500
     
 
-@app.route('/get_flight_details', methods=['GET'])
-def get_flight_details():
-    flight_id = request.args.get('flight_id')
-    query = "SELECT GioDi, GioDen FROM ChuyenBay WHERE MaChuyenBay = ?"
-    cursor.execute(query, (flight_id,))
-    result = cursor.fetchone()
-    if result:
-        return jsonify({
-            'departure_time': result.GioDi.isoformat(),
-            'arrival_time': result.GioDen.isoformat()
-        })
-    return jsonify({'error': 'Không tìm thấy chuyến bay'}), 404
-
 @app.route('/sua_dat_cho', methods=['POST'])
 @login_required
 def sua_dat_cho():
@@ -960,7 +969,7 @@ def xoa_dat_cho():
 
     return redirect(url_for('admin')) 
 
-### Các hàm xử lý cho quản lý MÁY BAY
+# 8. Quản lý máy bay
 
 @app.route('/them_mb', methods=['POST'])
 @login_required
@@ -1052,7 +1061,7 @@ def xoa_mb(plane_id):
         cnxn.rollback()
         return jsonify({'success': False, 'message': f'Lỗi khi xóa máy bay: {str(e)}'})
 
-### Các hàm xử lý cho quản lý KHÁCH HÀNG
+# 9. Quản lý khách hàng
 
 @app.route('/them_kh', methods=['POST'])
 @login_required
@@ -1144,7 +1153,7 @@ def xoa_kh(customer_id):
         cnxn.rollback()
         return jsonify({"status": "error", "message": f"Có lỗi xảy ra: {str(e)}"})
 
-### Các hàm xử lý cho quản lý NHÂN VIÊN
+# 10. Quản lý nhân viên
 
 @app.route('/them_nv', methods=['POST'])
 @login_required
@@ -1225,7 +1234,7 @@ def xoa_nv(employee_id):
         return jsonify({"status": "error", "message": f"Có lỗi xảy ra: {str(e)}"})
 
 
-### Các hàm xử lý cho quản lý LỊCH BAY
+# 11. Quản lý lịch bay
 
 @app.route('/them_lich', methods=['POST'])
 @login_required
@@ -1329,8 +1338,7 @@ def xoa_lich():
         cnxn.rollback()
         return jsonify({"error": f"Lỗi khi xóa lịch bay: {str(e)}"}), 500
     
-
-### Các hàm xử lý cho quản lý PHÂN CÔNG 
+# 12. Quản lý phân công
 
 @app.route('/them_phan_cong', methods=['POST'])
 @login_required

@@ -1,0 +1,28 @@
+{
+    "helpLink": "TRỢ GIÚP",
+    "loginLink": "ĐĂNG NHẬP",
+    "registerLink": "ĐĂNG KÝ",
+    "languageSelector": "VIETNAM - TIẾNG VIỆT",
+    "modalTitle": "Lựa chọn Vùng và ngôn ngữ",
+    "countryLabel": "Quốc gia/Vùng:",
+    "languageLabel": "Ngôn ngữ:",
+    "applyButton": "LỰA CHỌN",
+    "navBooking": "ĐĂNG KÝ KHÁCH HÀNG",
+    "navManage": "ĐẶT CHỖ",
+    "navCheckIn": "TRA CỨU CHUYẾN BAY, LỊCH BAY",
+    "popularFlights": "Khám Phá Các Chuyến Bay Phổ Biến Nhất Của Chúng Tôi",
+    "priceNote": "*Giá vé hiển thị được thu thập trong vòng 48 giờ và có thể không còn hiệu lực tại thời điểm đặt chỗ. Chúng tôi có thể thu thêm phí và lệ phí cho một số sản phẩm và dịch vụ.",
+    "countries": {
+      "vietnam": "VIETNAM",
+      "usa": "USA",
+      "japan": "Japan",
+      "laos": "Laos",
+      "malaysia": "Malaysia",
+      "myanmar": "Myanmar",
+      "thailand": "Thailand"
+    },
+    "languages": {
+      "tieng-viet": "Tiếng Việt",
+      "english": "-- Chúng tôi đang phát triển thêm các ngôn ngữ khác --"
+    }
+  }

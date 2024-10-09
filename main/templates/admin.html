@@ -10,35 +10,44 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+  
+  <!-- Phần tiền xử lý khi tải trang (Preloader): -->
+
   <div id="preloader">
     <div class="spinner">
       <img src="{{ url_for('static', filename='images/wings.png') }}" alt="Avatar" class="avatar">
     </div>
   </div>
+
+  <!-- Phần chào mừng và header -->
+
   <header>
     <h2>Xin chào <span id="username">{{ username.upper() }}</span>, mời bạn</h2>
     <h1>QUẢN LÍ SÂN BAY</h1>
   </header>
   <script>
-    const usernameSpan = document.getElementById('username');
-    const logoutBtn = document.createElement('span');
-    logoutBtn.textContent = 'Đăng xuất Admin';
-    logoutBtn.style.display = 'none';
-    logoutBtn.style.marginLeft = '10px';
-    logoutBtn.style.cursor = 'pointer';
-    logoutBtn.addEventListener('click', () => {
-      window.location.href = '{{ url_for('logout') }}';
-    });
-  
-    usernameSpan.addEventListener('mouseenter', () => {
-      usernameSpan.appendChild(logoutBtn);
-      logoutBtn.style.display = 'inline';
-    });
-  
-    usernameSpan.addEventListener('mouseleave', () => {
+      const usernameSpan = document.getElementById('username');
+      const logoutBtn = document.createElement('span');
+      logoutBtn.textContent = 'Đăng xuất Admin';
       logoutBtn.style.display = 'none';
-    });
+      logoutBtn.style.marginLeft = '10px';
+      logoutBtn.style.cursor = 'pointer';
+      logoutBtn.addEventListener('click', () => {
+        window.location.href = '{{ url_for('logout') }}';
+      });
+    
+      usernameSpan.addEventListener('mouseenter', () => {
+        usernameSpan.appendChild(logoutBtn);
+        logoutBtn.style.display = 'inline';
+      });
+    
+      usernameSpan.addEventListener('mouseleave', () => {
+        logoutBtn.style.display = 'none';
+      });
   </script>
+
+  <!-- Thanh điều hướng (navigation): -->
+
   <nav>
     <ul>
       <li><a href="#dashboard">Dashboard</a></li>
@@ -62,6 +71,8 @@
       </li>
     </ul>
   </nav>
+  
+  <!-- Phần xử lý dashboard và biểu đồ: -->
     <main>
         <section id="dashboard">
           <div class="">
@@ -1476,6 +1487,7 @@
     <footer>
         <p>&copy; 2024 Quản lí sân bay. All rights reserved by Nam Nguyen & Tran Binh.</p>
     </footer>
+    <!-- Preloader và xử lý sự kiện trang đã tải xong: -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         setTimeout(function() {

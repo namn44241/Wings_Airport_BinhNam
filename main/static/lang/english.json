@@ -1,0 +1,28 @@
+{
+    "helpLink": "HELP",
+    "loginLink": "LOGIN",
+    "registerLink": "REGISTER",
+    "languageSelector": "VIETNAM - ENGLISH",
+    "modalTitle": "Select Region and Language",
+    "countryLabel": "Country/Region:",
+    "languageLabel": "Language:",
+    "applyButton": "APPLY",
+    "navBooking": "CUSTOMER REGISTRATION",
+    "navManage": "BOOKING",
+    "navCheckIn": "FLIGHT INFORMATION, SCHEDULE",
+    "popularFlights": "Discover Our Most Popular Flights",
+    "priceNote": "*Displayed fares are collected within 48 hours and may no longer be valid at the time of booking. We may charge additional fees for some products and services.",
+    "countries": {
+      "vietnam": "VIETNAM",
+      "usa": "USA",
+      "japan": "Japan",
+      "laos": "Laos",
+      "malaysia": "Malaysia",
+      "myanmar": "Myanmar",
+      "thailand": "Thailand"
+    },
+    "languages": {
+      "tieng-viet": "Vietnamese",
+      "english": "-- We are developing more languages --"
+    }
+  }
