@@ -1,0 +1,637 @@
+{
+  "info": {
+    "name": "API For Wings Airport Management",
+    "description": "Dưới đây là danh sách các API đã được định nghĩa, tổng cộng có **44 API**:\n\n### 1. Kiểm tra kết nối và đăng nhập\n- **`/test_connection`**: `GET` - Kiểm tra kết nối.\n- **`/`**: `GET` - Kiểm tra đăng nhập.\n- **`/login`**: `GET` - Đăng nhập.\n- **`/auth`**: `GET` - Xác thực người dùng.\n- **`/logout`**: `GET` - Đăng xuất.\n\n### 2. Quản lý sân bay và admin\n- **`/san_bay`**: `GET` - Lấy danh sách sân bay.\n- **`/admin`**: `GET` - Truy cập trang admin.\n\n### 3. Gửi email\n- **`/send-email`**: `POST` - Gửi email.\n\n### 4. Quản lý chuyến bay\n- **`/api/flights`**: `GET` - Lấy danh sách chuyến bay.\n- **`/api/search`**: `GET` - Tìm kiếm chuyến bay.\n- **`/api/book`**: `POST` - Đặt vé chuyến bay.\n- **`/get_flight_details`**: `GET` - Lấy chi tiết chuyến bay.\n\n### 5. Quản lý chuyến bay (admin)\n- **`/them_cb`**: `POST` - Thêm chuyến bay (yêu cầu đăng nhập).\n- **`/sua_cb`**: `POST` - Sửa thông tin chuyến bay (yêu cầu đăng nhập).\n- **`/xoa_cb/<flight_id>`**: `POST` - Xóa chuyến bay (yêu cầu đăng nhập).\n\n### 6. Quản lý loại máy bay\n- **`/them_loai_mb`**: `POST` - Thêm loại máy bay (yêu cầu đăng nhập).\n- **`/sua_loai_mb/<plane_type_id>`**: `POST` - Sửa loại máy bay (yêu cầu đăng nhập).\n- **`/xoa_loai_mb/<plane_type_id>`**: `POST` - Xóa loại máy bay (yêu cầu đăng nhập).\n\n### 7. Quản lý đặt chỗ\n- **`/them_dat_cho`**: `POST` - Thêm đặt chỗ (yêu cầu đăng nhập).\n- **`/them_dat_cho_fe`**: `POST` - Thêm đặt chỗ từ frontend.\n- **`/sua_dat_cho`**: `POST` - Sửa đặt chỗ (yêu cầu đăng nhập).\n- **`/xoa_dat_cho`**: `POST` - Xóa đặt chỗ (yêu cầu đăng nhập).\n\n### 8. Quản lý máy bay\n- **`/them_mb`**: `POST` - Thêm máy bay (yêu cầu đăng nhập).\n- **`/sua_mb`**: `POST` - Sửa máy bay (yêu cầu đăng nhập).\n- **`/xoa_mb/<plane_id>`**: `POST` - Xóa máy bay (yêu cầu đăng nhập).\n\n### 9. Quản lý khách hàng\n- **`/them_kh`**: `POST` - Thêm khách hàng (yêu cầu đăng nhập).\n- **`/next_customer_id`**: `GET` - Lấy ID khách hàng tiếp theo.\n- **`/them_kh_fe`**: `POST` - Thêm khách hàng từ frontend.\n- **`/sua_kh`**: `POST` - Sửa khách hàng (yêu cầu đăng nhập).\n- **`/xoa_kh/<customer_id>`**: `POST` - Xóa khách hàng (yêu cầu đăng nhập).\n\n### 10. Quản lý nhân viên\n- **`/them_nv`**: `POST` - Thêm nhân viên (yêu cầu đăng nhập).\n- **`/sua_nv/<employee_id>`**: `POST` - Sửa nhân viên (yêu cầu đăng nhập).\n- **`/xoa_nv/<employee_id>`**: `POST` - Xóa nhân viên (yêu cầu đăng nhập).\n\n### 11. Quản lý lịch bay\n- **`/them_lich`**: `POST` - Thêm lịch bay (yêu cầu đăng nhập).\n- **`/sua_lich`**: `POST` - Sửa lịch bay (yêu cầu đăng nhập).\n- **`/xoa_lich`**: `POST` - Xóa lịch bay (yêu cầu đăng nhập).\n\n### 12. Quản lý phân công\n- **`/them_phan_cong`**: `POST` - Thêm phân công (yêu cầu đăng nhập).\n- **`/sua_phan_cong`**: `POST` - Sửa phân công (yêu cầu đăng nhập).\n- **`/xoa_phan_cong`**: `POST` - Xóa phân công (yêu cầu đăng nhập).\n- **`/get_flight_details_for_assignment`**: `GET` - Lấy chi tiết chuyến bay cho phân công.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Kiểm tra kết nối và đăng nhập",
+      "item": [
+        {
+          "name": "Kiểm tra kết nối",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "localhost:5000/test_connection",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "test_connection"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Kiểm tra đăng nhập",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "localhost:5000/",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [""]
+            }
+          }
+        },
+        {
+          "name": "Đăng nhập",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "localhost:5000/login",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Xác thực người dùng",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "localhost:5000/auth",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "auth"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Đăng xuất",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "localhost:5000/logout",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Quản lý sân bay và admin",
+      "item": [
+        {
+          "name": "Lấy danh sách sân bay",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "localhost:5000/san_bay",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "san_bay"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Truy cập trang admin",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "localhost:5000/admin",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "admin"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Gửi email",
+      "item": [
+        {
+          "name": "Gửi email",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/send-email",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "send-email"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Quản lý chuyến bay",
+      "item": [
+        {
+          "name": "Lấy danh sách chuyến bay",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "localhost:5000/api/flights",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "api",
+                "flights"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Tìm kiếm chuyến bay",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "localhost:5000/api/search",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "api",
+                "search"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Đặt vé chuyến bay",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/api/book",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "api",
+                "book"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Lấy chi tiết chuyến bay",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "localhost:5000/get_flight_details",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "get_flight_details"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Quản lý chuyến bay (admin)",
+      "item": [
+        {
+          "name": "Thêm chuyến bay",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/them_cb",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "them_cb"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sửa thông tin chuyến bay",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/sua_cb",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "sua_cb"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Xóa chuyến bay",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/xoa_cb/<flight_id>",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "xoa_cb",
+                "<flight_id>"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Quản lý loại máy bay",
+      "item": [
+        {
+          "name": "Thêm loại máy bay",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/them_loai_mb",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "them_loai_mb"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sửa loại máy bay",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/sua_loai_mb/<plane_type_id>",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "sua_loai_mb",
+                "<plane_type_id>"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Xóa loại máy bay",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/xoa_loai_mb/<plane_type_id>",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "xoa_loai_mb",
+                "<plane_type_id>"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Quản lý đặt chỗ",
+      "item": [
+        {
+          "name": "Thêm đặt chỗ",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/them_dat_cho",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "them_dat_cho"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Thêm đặt chỗ từ frontend",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/them_dat_cho_fe",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "them_dat_cho_fe"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sửa đặt chỗ",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/sua_dat_cho",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "sua_dat_cho"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Xóa đặt chỗ",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/xoa_dat_cho",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "xoa_dat_cho"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Quản lý máy bay",
+      "item": [
+        {
+          "name": "Thêm máy bay",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/them_mb",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "them_mb"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sửa máy bay",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/sua_mb",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "sua_mb"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Xóa máy bay",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/xoa_mb/<plane_id>",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "xoa_mb",
+                "<plane_id>"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Quản lý khách hàng",
+      "item": [
+        {
+          "name": "Thêm khách hàng",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/them_kh",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "them_kh"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Lấy ID khách hàng tiếp theo",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "localhost:5000/next_customer_id",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "next_customer_id"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Thêm khách hàng từ frontend",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/them_kh_fe",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "them_kh_fe"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sửa khách hàng",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/sua_kh",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "sua_kh"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Xóa khách hàng",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/xoa_kh/<customer_id>",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "xoa_kh",
+                "<customer_id>"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Quản lý nhân viên",
+      "item": [
+        {
+          "name": "Thêm nhân viên",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/them_nv",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "them_nv"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sửa nhân viên",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/sua_nv/<employee_id>",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "sua_nv",
+                "<employee_id>"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Xóa nhân viên",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/xoa_nv/<employee_id>",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "xoa_nv",
+                "<employee_id>"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Quản lý lịch bay",
+      "item": [
+        {
+          "name": "Thêm lịch bay",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/them_lich",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "them_lich"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sửa lịch bay",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/sua_lich",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "sua_lich"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Xóa lịch bay",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/xoa_lich",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "xoa_lich"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "12. Quản lý phân công",
+      "item": [
+        {
+          "name": "Thêm phân công",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/them_phan_cong",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "them_phan_cong"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sửa phân công",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/sua_phan_cong",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "sua_phan_cong"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Xóa phân công",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "localhost:5000/xoa_phan_cong",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "xoa_phan_cong"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Lấy chi tiết chuyến bay cho phân công",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "localhost:5000/get_flight_details_for_assignment",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [
+                "get_flight_details_for_assignment"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

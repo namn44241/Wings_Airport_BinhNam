@@ -1,6 +1,12 @@
-# 1.1. Tổng quan về sân bay Wings Airport
+# Video Demo
 
 https://youtu.be/diddub_jWAM?si=4pPiAdezpXkX1kUP
+
+# Check API
+
+https://www.postman.com/technical-candidate-72354826/namnam/collection/t5csmib/api-for-wings-airport-management
+
+# 1.1. Tổng quan về sân bay Wings Airport
 
 Sân bay quốc tế Wings Airport hướng đến là một sân bay thật sự trong hệ thống giao thông hàng không của Việt Nam. Với số lượng hành khách ngày càng tăng, và các chuyến bay [nội địa/quốc tế] được khai thác thường xuyên, Wings Airport của chúng em ra đời đang phải đối mặt với nhiều thách thức:
 

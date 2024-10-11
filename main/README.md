@@ -10,7 +10,6 @@
 - Quản lý thông tin chuyến bay
 - Quản lý thông tin lịch bay
 - Quản lý thông tin đặt chỗ
-- Quản lý thông tin khả năng
 - Quản lý thông tin phân công
 
 ## Mục đích
@@ -49,3 +48,5 @@
 - Mỗi khách hàng có thể đặt chỗ theo lịch bay của hãng hàng không đưa ra. Giả sử mỗi khách hàng chỉ được phép đặt tối đa một chỗ trên một chuyến bay vào một ngày cụ thể và một lịch bay sẽ được đăng kí bởi nhiều khách hàng.
 - Các nhân viên được phân công vào một hay nhiều lịch bay, một lịch bay sẽ cần nhiều nhân viên.
 - Một loại máy bay sẽ được sử dụng cho nhiều lịch bay.
+... và các ràng buộc khác
+
